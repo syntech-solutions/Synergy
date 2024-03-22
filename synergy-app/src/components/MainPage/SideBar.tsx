@@ -23,7 +23,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { Navigate, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard.js";
-import ChatMain from "../Chats/ChatMain.js";
+import ChatMain from "../PeopleMain/PeopleMain.js";
 import SyncMain from "../Syncs/SyncMain.js";
 import ProjectsPage from "../Projects/projects.js";
 import { useState } from "react";
@@ -134,6 +134,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
       else if (selectedPage === "Chats") navigate("/MainPage/Chats");
       else if (selectedPage === "Syncs") navigate("/MainPage/Syncs");
       else if (selectedPage === "Projects") navigate("/MainPage/Projects");
+      else if (selectedPage === "People") navigate("/MainPage/People");
       else if (selectedPage === "Profile") navigate("/MainPage/Profile");
       // if (selectedPage === "Dashboard") "Settings":
       else if (selectedPage === "Logout") {
@@ -180,44 +181,48 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Dashboard", "Syncs", "Chats", "Projects"].map((text, index) => (
-            <ListItem
-              key={text}
-              disablePadding
-              sx={{ display: "block" }}
-              onClick={() => handleSelect(text)}
-            >
-              <ListItemButton
-                sx={{
-                  minHeight: 48,
-                  justifyContent: open ? "initial" : "center",
-                  px: 2.5,
-                }}
+          {["Dashboard", "Syncs", "Chats", "Projects", "People"].map(
+            (text, index) => (
+              <ListItem
+                key={text}
+                disablePadding
+                sx={{ display: "block" }}
+                onClick={() => handleSelect(text)}
               >
-                <ListItemIcon
+                <ListItemButton
                   sx={{
-                    minWidth: 0,
-                    mr: open ? 3 : "auto",
-                    justifyContent: "center",
+                    minHeight: 48,
+                    justifyContent: open ? "initial" : "center",
+                    px: 2.5,
                   }}
                 >
-                  {(() => {
-                    switch (index) {
-                      case 0:
-                        return <DashboardIcon />;
-                      case 1:
-                        return <SyncIcon />;
-                      case 2:
-                        return <ChatIcon />;
-                      case 3:
-                        return <AssignmentIcon />;
-                    }
-                  })()}
-                </ListItemIcon>
-                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-              </ListItemButton>
-            </ListItem>
-          ))}
+                  <ListItemIcon
+                    sx={{
+                      minWidth: 0,
+                      mr: open ? 3 : "auto",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {(() => {
+                      switch (index) {
+                        case 0:
+                          return <DashboardIcon />;
+                        case 1:
+                          return <SyncIcon />;
+                        case 2:
+                          return <ChatIcon />;
+                        case 3:
+                          return <AssignmentIcon />;
+                        case 4:
+                          return <AccountBoxIcon />;
+                      }
+                    })()}
+                  </ListItemIcon>
+                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+                </ListItemButton>
+              </ListItem>
+            )
+          )}
         </List>
         {/* <Divider /> */}
         <Box sx={{ flexGrow: 1, p: 3 }} />

@@ -7,7 +7,7 @@ import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import MemberSelectAvatarChip from "./MemberSelect";
-import { TextField } from "@mui/material";
+import { Box, TextField } from "@mui/material";
 import { useState } from "react";
 
 export default function CreateSync() {
@@ -17,37 +17,47 @@ export default function CreateSync() {
   const [emailErr, setEmailErr] = useState(false);
 
   return (
-    <FormControl defaultValue="" required>
-      {/* <Label>Sync Name</Label>
+    <Box
+      sx={
+        {
+          // display: "flex",
+          // flexDirection: "row",
+          // maxWidth: "100vh",
+        }
+      }
+    >
+      <FormControl defaultValue="" required>
+        {/* <Label>Sync Name</Label>
       <StyledInput placeholder="Write your sync here" />
       <Label>Sync Description</Label>
       <StyledInput placeholder="Write your sync description here" /> */}
-      {/* Text Box for name */}
-      <TextField
-        required
-        id="syncName"
-        label="SyncName"
-        variant="outlined"
-        onChange={(e: any) => setSyncName(e.target.value)}
-        fullWidth
-        error={nameErr} // Add the error prop here
-        helperText={nameErr ? "Enter Sync Name" : ""} // Add the helperText prop here
-      />
-      {/* Text Box for email */}
-      <TextField
-        required
-        id="syncDesc"
-        label="SyncDesc"
-        variant="outlined"
-        onChange={(e: any) => setSyncDesc(e.target.value)}
-        fullWidth
-        error={nameErr} // Add the error prop here
-        helperText={nameErr ? "Enter Sync Description" : ""} // Add the helperText prop here
-      />
-      <Label>Add Members</Label>
-      <MemberSelectAvatarChip />
-      <HelperText />
-    </FormControl>
+        {/* Text Box for name */}
+        <TextField
+          required
+          id="syncName"
+          label="SyncName"
+          variant="outlined"
+          onChange={(e: any) => setSyncName(e.target.value)}
+          fullWidth
+          error={nameErr} // Add the error prop here
+          helperText={nameErr ? "Enter Sync Name" : ""} // Add the helperText prop here
+        />
+        {/* Text Box for email */}
+        <TextField
+          required
+          id="syncDesc"
+          label="SyncDesc"
+          variant="outlined"
+          onChange={(e: any) => setSyncDesc(e.target.value)}
+          fullWidth
+          error={nameErr} // Add the error prop here
+          helperText={nameErr ? "Enter Sync Description" : ""} // Add the helperText prop here
+        />
+        <Label>Add Members</Label>
+        <MemberSelectAvatarChip />
+        <HelperText />
+      </FormControl>
+    </Box>
   );
 }
 

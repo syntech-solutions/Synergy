@@ -167,9 +167,14 @@ const SignUp = () => {
       const userData = {
         userId: userIdRef,
         syncID: [],
+        chatID: [],
         projectID: [],
         EventID: [],
-        toolID: [],
+        taskID: [],
+        brainBoardID: [],
+        whiteBoardID: [],
+        documentID: [],
+        notificationID: [],
       };
 
       await setDoc(doc(db, "userData", userId), userData);

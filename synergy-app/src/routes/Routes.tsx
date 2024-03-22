@@ -5,14 +5,15 @@ import MainLayout from "../components/MainLayout";
 import MiniDrawer from "../components/MainPage/SideBar";
 import MainSync from "../components/Syncs/MainSync";
 import Dashboard from "../components/MainPage/Dashboard";
-import ChatMain from "../components/Chats/ChatMain";
+import ChatMain from "../components/PeopleMain/PeopleMain";
 import ProjectsPage from "../components/Projects/projects";
 import SyncMain from "../components/Syncs/SyncMain";
 import ProfilePage from "../components/MainPage/ProfilePage";
 import SignIn from "../components/LandingPage/SignIn";
 import SignUp from "../components/LandingPage/SignUp";
 import MainSyncs from "../components/Syncs/main-syncs (1)";
-import Profile from "../components/MainPage/Profile";
+import Profile from "../components/ProfilePage/Profile";
+import PeopleMain from "../components/PeopleMain/PeopleMain";
 
 const routes: RouteObject[] = [
   {
@@ -47,6 +48,10 @@ const routes: RouteObject[] = [
             element: (
               <MiniDrawer mainContent={<ProjectsPage window={window} />} />
             ),
+          },
+          {
+            path: "People",
+            element: <MiniDrawer mainContent={<PeopleMain />} />,
           },
           {
             path: "Profile",
