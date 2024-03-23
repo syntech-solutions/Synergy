@@ -3,7 +3,7 @@ import React from "react";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
 
-const getPriorityColor = (priority: string) => {
+const getPriorityColor = (priority) => {
   switch (priority.toLowerCase()) {
     case "high":
       return "#FD151B";
@@ -16,7 +16,7 @@ const getPriorityColor = (priority: string) => {
   }
 };
 
-const getPriorityTextColor = (priority: string) => {
+const getPriorityTextColor = (priority) => {
   switch (priority.toLowerCase()) {
     case "high":
       return "white";
@@ -31,19 +31,7 @@ const getPriorityTextColor = (priority: string) => {
 
 const label = { inputProps: { "aria-label": "Checkbox" } };
 
-const TaskBox = ({
-  task,
-  assignee,
-  priority,
-  deadline,
-  description,
-}: {
-  task: string;
-  assignee: string;
-  priority: string;
-  deadline: string;
-  description: string;
-}) => {
+const TaskBox1 = ({ task, assignee, priority, deadline, description }) => {
   const priorityColor = getPriorityColor(priority);
   const priorityTextColor = getPriorityTextColor(priority);
 
@@ -58,9 +46,8 @@ const TaskBox = ({
         width: "100%",
         minWidth: "300px",
         padding: "10px",
-        border: "2px solid #05284C",
+        border: "1px solid #05284C",
         backgroundColor: "#fff",
-        borderRadius: "5px",
         marginBottom: "20px",
       }}
     >
@@ -93,4 +80,4 @@ const TaskBox = ({
   );
 };
 
-export default TaskBox;
+export default TaskBox1;

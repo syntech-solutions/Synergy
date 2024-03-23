@@ -25,7 +25,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import Dashboard from "./Dashboard.js";
 import ChatMain from "../PeopleMain/PeopleMain.js";
 import SyncMain from "../Syncs/SyncMain.js";
-import ProjectsPage from "../Projects/projects.js";
+import ProjectsPage from "../Projects/projects1.js";
 import { useState } from "react";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import SimpleBottomNavigation from "./BottomNav.js";

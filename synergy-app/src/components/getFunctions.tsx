@@ -1,43 +1,55 @@
-// import { doc, getDoc } from "firebase/firestore";
-// import { db } from "../config/firebase";
-
-// const createUserDocument = async (userId: any) => {
-//   //check if user exists in firestore
-//   try {
-//     const ref = doc(db, "userData", userId);
-//     const userDoc = await getDoc(ref);
-//   } catch (error) {
-//     // if ((error as FirebaseError).code === "") {
-
-//     // }
-//     console.log(error);
-//   }
-
-//   return userDoc;
-
-// };
-
-import { useState, useEffect } from "react";
+import { getDocs, collection, doc, getDoc } from "firebase/firestore";
 import { db } from "../config/firebase";
-import { getAuth } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
 
-const [user, setUser] = useState([]);
-// const auth = getAuth();
-// const fireUser = auth.currentUser?.uid;
+export const getDocData = async (collectionName: string) => {
+  try {
+    const memberDetails: { memberID: string }[] = [];
 
-export const getUserdetails = async (userId: any) => {
-  const docRef = doc(db, "userData", userId);
+    // Query a reference to a subcollection
+    const querySnapshot = await getDocs(collection(db, collectionName));
+
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+
+      memberDetails.push({ ...doc.data(), memberID: doc.id });
+
+      // console.log(doc.id, " => ", doc.data());
+    });
+
+    return memberDetails;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const getUserSyncData = async (userID: string) => {
+  // try {
+  //   const syncArrayName: string[] = [];
+
+  //   const colRef = collection(db, "userData", userID);
+
+  //   const userDoc = await getDocs(colRef);
+  //   for (const doc of userDoc.docs) {
+  //     const records = doc.data()?.syncId;
+  //     for (const [id, record] of Object.entries(records)) {
+  //       syncArrayName.push([id, record]);
+  //     }
+  //   }
+
+  //   return syncArrayName;
+  // } catch (e) {
+  //   console.error(e);
+  //   return [];
+  // }
+
+  const docRef = doc(db, "userData", userID);
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    console.log("Document data:", docSnap.data());
-    setUser(docSnap.data() as any);
+    // console.log("Document data:", docSnap.data());
+    return docSnap.data();
   } else {
-    // doc.data() will be undefined in this case
+    // docSnap.data() will be undefined in this case
     console.log("No such document!");
   }
 };
-// useEffect(() => {
-//   getUserdetails(fireUser);
-// }, []);

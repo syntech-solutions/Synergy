@@ -6,7 +6,7 @@ import MiniDrawer from "../components/MainPage/SideBar";
 import MainSync from "../components/Syncs/MainSync";
 import Dashboard from "../components/MainPage/Dashboard";
 import ChatMain from "../components/PeopleMain/PeopleMain";
-import ProjectsPage from "../components/Projects/projects";
+import ProjectsPage from "../components/Projects/projects1";
 import SyncMain from "../components/Syncs/SyncMain";
 import ProfilePage from "../components/MainPage/ProfilePage";
 import SignIn from "../components/LandingPage/SignIn";

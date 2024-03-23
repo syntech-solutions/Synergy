@@ -23,7 +23,6 @@ import routes from "../../routes/Routes";
 import { auth, db } from "../../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import CreateSync from "./CreateSync";
-import CreateSyncDialog from "../MainPage/CreateSyncDialog";
 
 // TODO remove, this demo shouldn't need to reset the theme.
 document.body.style.backgroundColor = "#f9f9f1";
@@ -95,7 +94,7 @@ export default function SyncMain() {
       const colRef = doc(db, "userData", userId);
 
       const userDoc = await getDoc(colRef);
-      for (const [id, record] of Object.entries(userDoc.data()?.syncId)) {
+      for (const [id, record] of Object.entries(userDoc.data()?.syncID)) {
         syncArrayName.push(record[0]);
       }
 

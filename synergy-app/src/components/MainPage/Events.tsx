@@ -1,13 +1,13 @@
 import * as React from "react";
-import Title from "./Title";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import EventIcon from "@mui/icons-material/Event";
+import Title from "./Title";
 
-export default function Deposits() {
+export default function Events() {
   return (
     <React.Fragment>
       <Title>Upcoming Events</Title>

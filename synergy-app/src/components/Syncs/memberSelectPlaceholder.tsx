@@ -1,15 +1,10 @@
 import * as React from "react";
 import { Theme, useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import Chip from "@mui/material/Chip";
 import { useState } from "react";
-import { collection, doc, getDocs, onSnapshot } from "firebase/firestore";
-import { db, auth } from "../../config/firebase";
 import { useEffect } from "react";
 import { getDocData } from "../getFunctions";
 
@@ -46,11 +41,13 @@ function getStyles(name: string, personName: readonly string[], theme: Theme) {
   };
 }
 
-export default function MemberSelectAvatarChip() {
+export default function MultipleSelectPlaceholder() {
   const theme = useTheme();
   const [personName, setPersonName] = React.useState<string[]>([]);
 
-  const handleChange = (event: SelectChangeEvent<typeof personName>) => {
+  const [memberList, setMemberList] = useState<string[]>([]);
+
+  const handleChange = (event) => {
     const {
       target: { value },
     } = event;
@@ -58,6 +55,8 @@ export default function MemberSelectAvatarChip() {
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     );
+
+    console.log(personName);
   };
 
   const [memberSearch, setMemberSearch] = useState([]);
@@ -71,58 +70,63 @@ export default function MemberSelectAvatarChip() {
         let membersName: any = [];
 
         memberData?.forEach((member: any) => {
-          membersName.push([member.userName, member.memberID]);
+          membersName.push([
+            {
+              userName: member.userName,
+              userEmail: member.userEmail,
+              memberID: member.memberID,
+            },
+          ]);
         });
 
         setMemberSearch(membersName);
         console.log(memberSearch);
       } catch (err) {
-        console.log("Error occured when fetching books");
+        console.log("Error occured when fetching members list");
       }
     })();
   }, []);
 
   return (
     <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
-        <InputLabel id="demo-multiple-chip-label">Members</InputLabel>
+      <FormControl
+        defaultValue=""
+        required
+        sx={{
+          //   display: "flex",
+          flexDirection: "row",
+          width: "100vh",
+        }}
+      >
         <Select
-          labelId="demo-multiple-chip-label"
-          id="demo-multiple-chip"
+          fullWidth
+          required
           multiple
+          displayEmpty
           value={personName}
           onChange={handleChange}
-          input={<OutlinedInput id="select-multiple-chip" label="Members" />}
-          sx={{
-            width: "320px",
-            fontFamily: "IBM Plex Sans",
-            fontSize: "0.875rem",
-            fontWeight: 400,
-            lineHeight: 1.5,
-            padding: "8px 12px",
-            borderRadius: "8px",
-            color: "#212121",
-            background: "#fff",
-            border: `1px solid  "grey.200"`,
-            boxShadow: `0px 2px 2px  "grey.50"`,
+          input={<OutlinedInput />}
+          label="Members"
+          renderValue={(selected) => {
+            if (selected.length === 0) {
+              return "";
+            }
+
+            return selected.join(", ");
           }}
-          //   onFocus={}
-          renderValue={(selected) => (
-            <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-              {selected.map((value) => (
-                <Chip key={value} label={value} />
-              ))}
-            </Box>
-          )}
           MenuProps={MenuProps}
+          inputProps={{ "aria-label": "Without label" }}
         >
+          <MenuItem disabled value="">
+            Members
+          </MenuItem>
           {memberSearch.map((memberDetails) => (
             <MenuItem
               key={memberDetails[1]}
               value={memberDetails[0]}
               style={getStyles(memberDetails[0], personName, theme)}
             >
-              {memberDetails[0]}
+              {(memberDetails[0] + " | " + memberDetails[1]).toString()}
             </MenuItem>
           ))}
         </Select>

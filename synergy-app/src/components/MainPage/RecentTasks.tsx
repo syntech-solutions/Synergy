@@ -3,49 +3,83 @@ import Title from "./Title";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Grid } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import Tasks from "./Tasks";
 import { useState } from "react";
 import { auth, db } from "../../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { getUserSyncData } from "../getFunctions";
 
-export default function Orders() {
+export default function RecentTasks() {
   const [array, setArray] = useState<string[]>([]);
 
-  const getTaskNameArray = async () => {
-    try {
-      const userId = auth.currentUser?.uid || ""; // Ensure userId is always a string
-      // const userData = await getDoc(doc(db, "userData", userId)).then((snapshot) => {
+  // const getTaskNameArray = async () => {
+  //   try {
+  //     const userId = auth.currentUser?.uid || ""; // Ensure userId is always a string
+  //     // const userData = await getDoc(doc(db, "userData", userId)).then((snapshot) => {
 
-      // });
-      const taskArrayName: string[] = [];
+  //     // });
+  //     const taskArrayName: string[] = [];
 
-      const colRef = doc(db, "userData", userId);
+  //     const colRef = doc(db, "userData", userId);
 
-      const userDoc = await getDoc(colRef);
-      for (const [id, record] of Object.entries(userDoc.data()?.taskId)) {
-        taskArrayName.push(record);
-      }
-      // console.log(taskArrayName);
+  //     const userDoc = await getDoc(colRef);
+  //     for (const [id, record] of Object.entries(userDoc.data()?.taskId)) {
+  //       taskArrayName.push(record);
+  //     }
+  //     // console.log(taskArrayName);
 
-      setArray(taskArrayName);
-      //   console.log(taskArrayName);
-      return taskArrayName;
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
-  };
+  //     setArray(taskArrayName);
+  //     //   console.log(taskArrayName);
+  //     return taskArrayName;
+  //   } catch (e) {
+  //     console.error(e);
+  //     return [];
+  //   }
+  // };
   //   console.log(taskArrayName);
 
-  getTaskNameArray();
-  const taskArray = array.sort();
+  // getTaskNameArray();
+  // const taskArray = array.sort();
+
+  const [taskData, setTaskData] = useState<any>([]);
+
+  const [isLoading, setLoading] = useState(true);
+  const [singlePackage, setPackage] = useState([]);
+
+  React.useEffect(() => {
+    axios.get("http://localhost:5173/MainPage/Dashboard").then((response) => {
+      setPackage(response.data);
+      setLoading(false);
+    });
+  }, []);
+
+  React.useEffect(() => {
+    (async () => {
+      try {
+        const userTaskData = await getUserSyncData(auth.currentUser?.uid || "");
+        console.log(typeof userTaskData?.syncID);
+
+        let taskDataArray: any = [];
+
+        for (const [id, record] of Object.entries(userTaskData?.taskId)) {
+          taskDataArray.push([id, record]);
+        }
+
+        setTaskData(taskDataArray);
+        console.log(taskDataArray);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [isLoading]);
 
   const navigate = useNavigate();
 
   return (
-    <React.Fragment>
+    <>
       <Box
         sx={{
           display: "flex",
@@ -81,13 +115,19 @@ export default function Orders() {
             justifyContent: "space-evenly",
           }}
         >
-          {taskArray.map((array, index) => (
-            <Tasks task={array[0]} project={array[1]} dueDate={array[2]} />
-          ))}
-          {/* <Tasks task="Task Name" project="Project Name" dueDate="DD/MM/YYYY" /> */}
-          {/* <Tasks task="Task Name" project="Project Name" dueDate="DD/MM/YYYY" /> */}
+          {taskData.length === 0 ? (
+            <Typography>No Tasks</Typography>
+          ) : (
+            taskData.map((array: any[][]) => (
+              <Tasks
+                task={array[1][0]}
+                project={array[1][1]}
+                dueDate={array[1][2]}
+              />
+            ))
+          )}
         </Box>
       </Grid>
-    </React.Fragment>
+    </>
   );
 }

@@ -223,38 +223,17 @@ const SignIn = () => {
         {/* Text for sign up */}
         <Box sx={{ display: "flex", justifyContent: "left", mt: 3 }}>
           <Typography variant="body1">{"Don't have an account ?⠀"}</Typography>
-          {/* <Routes>
-            <Route path="/SignIn" element={<SignIn />} />
-            <Route path="/SignUp" element={<SignUp />} />
-          </Routes> */}
-          <Link to="/Auth/SignUp">
-            <Typography
-              variant="subtitle1"
-              color="secondary"
-              sx={{ cursor: "pointer" }}
-              // onClick={() => <Navigate to="/SignIn" replace={true} />}
-            >
-              Sign Up here
-            </Typography>
-          </Link>
-        </Box>
-        {/* {userSignedIn ? (
-          <Button
-            variant="outlined"
-            onClick={() => signOut(auth)}
-            sx={{
-              bgcolor: "white",
-              mt: 3,
-              p: 1,
-              width: "auto",
-              borderColor: "#cfcfcf",
-            }}
+          {/* <Link to="/Auth/SignUp"> */}
+          <Typography
+            variant="subtitle1"
+            color="secondary"
+            sx={{ cursor: "pointer" }}
+            onClick={() => navigate("/Auth/SignUp")}
           >
-            <Typography variant="button">Sign Out</Typography>
-          </Button>
-        ) : (
-          ""
-        )} */}
+            Sign Up here
+          </Typography>
+          {/* </Link> */}
+        </Box>
         {userSignedIn ? <Navigate to="/MainPage" replace={true} /> : ""}
       </Box>
     </>

@@ -30,8 +30,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { Link, Navigate, Route, Routes } from "react-router-dom";
-import SignIn from "./SignIn";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 const SignUp = () => {
   // state variables
@@ -63,7 +62,7 @@ const SignUp = () => {
 
   // useEffect to update passwordMatchErr
 
-  React.useEffect(() => {
+  useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
         setUserSignedIn(true);
@@ -197,6 +196,8 @@ const SignUp = () => {
   }) => {
     setRole(event.target.value);
   };
+
+  const navigate = useNavigate();
 
   return (
     <>
@@ -392,15 +393,17 @@ const SignUp = () => {
         </Button>
         <Box sx={{ display: "flex", justifyContent: "left", mt: 3 }}>
           <Typography variant="body1">{"Have an account?⠀"}</Typography>
-          <Link to="/Auth/SignIn">
-            <Typography
-              variant="subtitle1"
-              color="secondary"
-              sx={{ cursor: "pointer", textIndent: 10 }}
-            >
-              Login Here
-            </Typography>
-          </Link>
+          {/* <Link to="/Auth/SignIn"> */}
+
+          <Typography
+            variant="subtitle1"
+            color="secondary"
+            sx={{ cursor: "pointer", textIndent: 10 }}
+            onClick={() => navigate("/Auth/SignIn")}
+          >
+            Login Here
+          </Typography>
+          {/* </Link> */}
         </Box>
         {userSignedIn ? <Navigate to="/MainPage" replace={true} /> : ""}
       </Box>

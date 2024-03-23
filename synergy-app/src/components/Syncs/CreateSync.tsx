@@ -1,5 +1,6 @@
 import * as React from "react";
-import { FormControl, useFormControlContext } from "@mui/base/FormControl";
+import { useFormControlContext } from "@mui/base/FormControl";
+import { FormControl } from "@mui/material";
 import { Input, inputClasses } from "@mui/base/Input";
 import { styled } from "@mui/system";
 import clsx from "clsx";
@@ -7,55 +8,93 @@ import Avatar from "@mui/material/Avatar";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
 import MemberSelectAvatarChip from "./MemberSelect";
-import { Box, TextField } from "@mui/material";
-import { useState } from "react";
+import { Autocomplete, Box, TextField } from "@mui/material";
+import { useEffect, useState } from "react";
+import MultipleSelectPlaceholder from "./memberSelectPlaceholder";
+import { getDocData } from "../getFunctions";
 
 export default function CreateSync() {
   const [syncName, setSyncName] = useState("");
   const [nameErr, setNameErr] = useState(false);
   const [syncDesc, setSyncDesc] = useState("");
   const [emailErr, setEmailErr] = useState(false);
+  const [memberSearch, setMemberSearch] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const memberData = await getDocData("userDetails");
+        console.log(memberData);
+
+        let membersName: any = [];
+
+        memberData?.forEach((member: any) => {
+          membersName.push({
+            userName: member.userName,
+            userEmail: member.userEmail,
+            memberID: member.memberID,
+          });
+        });
+        console.log(membersName);
+
+        setMemberSearch(membersName);
+        // console.log(memberSearch);
+      } catch (err) {
+        console.log("Error occured when fetching members list");
+      }
+    })();
+  }, []);
 
   return (
     <Box
-      sx={
-        {
-          // display: "flex",
-          // flexDirection: "row",
-          // maxWidth: "100vh",
-        }
-      }
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        width: "100vh",
+      }}
     >
-      <FormControl defaultValue="" required>
+      <FormControl defaultValue="" required fullWidth={true}>
         {/* <Label>Sync Name</Label>
       <StyledInput placeholder="Write your sync here" />
       <Label>Sync Description</Label>
       <StyledInput placeholder="Write your sync description here" /> */}
         {/* Text Box for name */}
+        <Label>Enter Sync Name</Label>
         <TextField
           required
           id="syncName"
-          label="SyncName"
+          label="Sync Name"
           variant="outlined"
           onChange={(e: any) => setSyncName(e.target.value)}
-          fullWidth
+          fullWidth={true}
           error={nameErr} // Add the error prop here
-          helperText={nameErr ? "Enter Sync Name" : ""} // Add the helperText prop here
+          // helperText={nameErr ? "Enter Sync Name" : ""} // Add the helperText prop here
         />
         {/* Text Box for email */}
+        <Label>Enter Sync Description</Label>
         <TextField
           required
           id="syncDesc"
-          label="SyncDesc"
+          label="Sync Description"
           variant="outlined"
           onChange={(e: any) => setSyncDesc(e.target.value)}
-          fullWidth
+          fullWidth={true}
           error={nameErr} // Add the error prop here
-          helperText={nameErr ? "Enter Sync Description" : ""} // Add the helperText prop here
+          // helperText={nameErr ? "Enter Sync Description" : ""} // Add the helperText prop here
         />
         <Label>Add Members</Label>
-        <MemberSelectAvatarChip />
-        <HelperText />
+        <Autocomplete
+          fullWidth={true}
+          multiple
+          id="tags-outlined"
+          options={memberSearch}
+          getOptionLabel={(option) => option.userName}
+          // defaultValue={[top100Films[13]]}
+          filterSelectedOptions
+          renderInput={(params) => (
+            <TextField {...params} label="Add Members" placeholder="Members" />
+          )}
+        />
       </FormControl>
     </Box>
   );
