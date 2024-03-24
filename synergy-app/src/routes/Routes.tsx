@@ -14,6 +14,7 @@ import SignUp from "../components/LandingPage/SignUp";
 import MainSyncs from "../components/Syncs/main-syncs (1)";
 import Profile from "../components/ProfilePage/Profile";
 import PeopleMain from "../components/PeopleMain/PeopleMain";
+import AdvancedCalendar from "../components/AdvancedCalendar";
 
 const routes: RouteObject[] = [
   {
@@ -56,6 +57,11 @@ const routes: RouteObject[] = [
           {
             path: "Profile",
             element: <MiniDrawer mainContent={<Profile />} />,
+          },
+          {
+            path: "Calendar",
+            element: <MiniDrawer mainContent={<AdvancedCalendar />} />,
+            // element: <ControlCalendar />,
           },
         ],
       },

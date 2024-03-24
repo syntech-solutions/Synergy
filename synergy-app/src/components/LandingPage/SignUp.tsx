@@ -155,6 +155,9 @@ const SignUp = () => {
         DOB: String(dateOfBirth.format("DD/MM/YYYY")),
         profilePic: "",
         userType: role,
+        userCompany: "",
+        userSkills: "",
+        userAbout: "",
       };
 
       await setDoc(doc(db, "userDetails", userId), userDetails);
@@ -342,20 +345,20 @@ const SignUp = () => {
           </LocalizationProvider>
 
           <FormControl sx={{ mt: 3, width: "100%" }}>
-            <InputLabel id="demo-simple-select-label">Role * </InputLabel>
+            <InputLabel id="role-select-label">Role * </InputLabel>
             <Select
-              labelId="demo-simple-select-label"
-              id="demo-simple-select"
+              labelId="role-select-label"
+              id="role-select"
               value={role}
               label="Role *"
               onChange={handleChange}
             >
-              <MenuItem value={"student"}>Student</MenuItem>
-              <MenuItem value={"general user"}>General User</MenuItem>
-              <MenuItem value={"vocational educator"}>
+              <MenuItem value={"Student"}>Student</MenuItem>
+              <MenuItem value={"General User"}>General User</MenuItem>
+              <MenuItem value={"Vocational Educator"}>
                 Vocational Educator
               </MenuItem>
-              <MenuItem value={"advertising and business firms"}>
+              <MenuItem value={"Advertising and Business Firms"}>
                 Advertising and Business Firms
               </MenuItem>
             </Select>

@@ -111,6 +111,8 @@ export default function MainSyncs() {
     "https://firebasestorage.googleapis.com/v0/b/synergy-75d4a.appspot.com/o/Logo.png?alt=media&token=81f29e27-e8fd-4cb4-9c00-f083a1cc199a"
   );
 
+  const [createdSync, setCreatedSync] = useState<any>(false);
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -206,6 +208,8 @@ export default function MainSyncs() {
     } catch (e) {
       console.log(e);
     }
+
+    setCreatedSync(true);
   };
 
   const [memberSearch, setMemberSearch] = useState([]);
@@ -258,11 +262,12 @@ export default function MainSyncs() {
 
         setSyncData(syncDataArray);
         console.log(syncDataArray);
+        setCreatedSync(false);
       } catch (err) {
         console.log(err);
       }
     })();
-  }, []);
+  }, [createdSync]);
 
   const navigate = useNavigate();
 

@@ -34,6 +34,7 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../config/firebase.js";
 import MainSync from "../Syncs/MainSync.js";
 import { useEffect } from "react";
+import { CalendarMonth } from "@mui/icons-material";
 
 const drawerWidth = 240;
 
@@ -136,6 +137,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
       else if (selectedPage === "Projects") navigate("/MainPage/Projects");
       else if (selectedPage === "People") navigate("/MainPage/People");
       else if (selectedPage === "Profile") navigate("/MainPage/Profile");
+      else if (selectedPage === "Calendar") navigate("/MainPage/Calendar");
       // if (selectedPage === "Dashboard") "Settings":
       else if (selectedPage === "Logout") {
         signOut(auth);
@@ -181,48 +183,55 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
         </DrawerHeader>
         <Divider />
         <List>
-          {["Dashboard", "Syncs", "Chats", "Projects", "People"].map(
-            (text, index) => (
-              <ListItem
-                key={text}
-                disablePadding
-                sx={{ display: "block" }}
-                onClick={() => handleSelect(text)}
+          {[
+            "Dashboard",
+            "Syncs",
+            "Chats",
+            "Projects",
+            "People",
+            "Calendar",
+          ].map((text, index) => (
+            <ListItem
+              key={text}
+              disablePadding
+              sx={{ display: "block" }}
+              onClick={() => handleSelect(text)}
+            >
+              <ListItemButton
+                sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
+                }}
               >
-                <ListItemButton
+                <ListItemIcon
                   sx={{
-                    minHeight: 48,
-                    justifyContent: open ? "initial" : "center",
-                    px: 2.5,
+                    minWidth: 0,
+                    mr: open ? 3 : "auto",
+                    justifyContent: "center",
                   }}
                 >
-                  <ListItemIcon
-                    sx={{
-                      minWidth: 0,
-                      mr: open ? 3 : "auto",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {(() => {
-                      switch (index) {
-                        case 0:
-                          return <DashboardIcon />;
-                        case 1:
-                          return <SyncIcon />;
-                        case 2:
-                          return <ChatIcon />;
-                        case 3:
-                          return <AssignmentIcon />;
-                        case 4:
-                          return <AccountBoxIcon />;
-                      }
-                    })()}
-                  </ListItemIcon>
-                  <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
-                </ListItemButton>
-              </ListItem>
-            )
-          )}
+                  {(() => {
+                    switch (index) {
+                      case 0:
+                        return <DashboardIcon />;
+                      case 1:
+                        return <SyncIcon />;
+                      case 2:
+                        return <ChatIcon />;
+                      case 3:
+                        return <AssignmentIcon />;
+                      case 4:
+                        return <AccountBoxIcon />;
+                      case 5:
+                        return <CalendarMonth />;
+                    }
+                  })()}
+                </ListItemIcon>
+                <ListItemText primary={text} sx={{ opacity: open ? 1 : 0 }} />
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
         {/* <Divider /> */}
         <Box sx={{ flexGrow: 1, p: 3 }} />
