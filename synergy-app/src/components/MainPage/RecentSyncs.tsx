@@ -85,7 +85,7 @@ export default function RecentSyncs() {
     (async () => {
       try {
         const userSyncData = await getUserSyncData(auth.currentUser?.uid || "");
-        console.log(typeof userSyncData?.syncID);
+        // console.log(typeof userSyncData?.syncID);
 
         let syncDataArray: any = [];
 
@@ -98,7 +98,7 @@ export default function RecentSyncs() {
         }
 
         setSyncData(syncDataArray);
-        console.log(syncDataArray);
+        // console.log(syncDataArray);
       } catch (err) {
         console.log(err);
       }

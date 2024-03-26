@@ -6,7 +6,7 @@ import MiniDrawer from "../components/MainPage/SideBar";
 import MainSync from "../components/Syncs/MainSync";
 import Dashboard from "../components/MainPage/Dashboard";
 import ChatMain from "../components/PeopleMain/PeopleMain";
-import ProjectsPage from "../components/Projects/projects1";
+import ProjectsPage from "../components/Projects/projects(2)";
 import SyncMain from "../components/Syncs/SyncMain";
 import ProfilePage from "../components/MainPage/ProfilePage";
 import SignIn from "../components/LandingPage/SignIn";
@@ -15,6 +15,7 @@ import MainSyncs from "../components/Syncs/main-syncs (1)";
 import Profile from "../components/ProfilePage/Profile";
 import PeopleMain from "../components/PeopleMain/PeopleMain";
 import AdvancedCalendar from "../components/AdvancedCalendar";
+import SyncsPage from "../components/Syncs/syncspage";
 
 const routes: RouteObject[] = [
   {
@@ -67,7 +68,7 @@ const routes: RouteObject[] = [
       },
       {
         path: "/Syncs/:id",
-        element: <MiniDrawer mainContent={<MainSync />} />,
+        element: <MiniDrawer mainContent={<SyncsPage />} />,
       },
       {
         path: "/*",

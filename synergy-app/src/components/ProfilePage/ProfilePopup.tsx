@@ -13,18 +13,27 @@ import {
   DialogContentText,
   DialogTitle,
   Grid,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReportProblemIcon from "@mui/icons-material/ReportProblem";
 import { CenterFocusStrong } from "@mui/icons-material";
+import { useEffect } from "react";
+import { auth } from "../../config/firebase";
+import { getUserDetails } from "../getFunctions";
 
-const ProfilePopup = () => {
+const ProfilePopup = (props: { userID: string; popUp: boolean }) => {
   {
     /*useStates from existing Profile Page*/
   }
+  const userID = props.userID;
+  const userProfile = props.popUp;
   const [name, setName] = useState("Jane Doe");
-  const [username, setUsername] = useState("janedoe");
+  // const [username, setUsername] = useState("janedoe");
   const [email, setEmail] = useState("user@email.com");
   const [about, setAbout] = useState("About me");
   const [company, setCompany] = useState("Company/School");
@@ -32,12 +41,41 @@ const ProfilePopup = () => {
   const [skills, setSkills] = useState("Your Skills");
   const [tempProfilePicture, setTempProfilePicture] = useState(null);
   const [openReport, setOpenReport] = useState(false);
-  const [openProfile, setOpenProfile] = useState(false);
+  const [openProfile, setOpenProfile] = useState(userProfile);
+  const [reportCategory, setReportCategory] = useState("");
 
+  const handleCategoryChange = (event: {
+    target: { value: React.SetStateAction<string> };
+  }) => {
+    setReportCategory(event.target.value);
+  };
   const handleOpenReport = () => setOpenReport(true);
   const handleCloseReport = () => setOpenReport(false);
   const handleOpenProfile = () => setOpenProfile(true);
   const handleCloseProfile = () => setOpenProfile(false);
+
+  const [profileData, setProfileData] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      try {
+        console.log(userID);
+        const userProfileDetails = await getUserDetails(userID);
+        // console.log(userProfileDetails.userEmail);
+        setName(userProfileDetails?.userName || "");
+        setEmail(userProfileDetails?.userEmail || "");
+        setAbout(userProfileDetails?.userAbout || "");
+        setCompany(userProfileDetails?.userCompany || "");
+        setRole(userProfileDetails?.userType || "");
+        setSkills(userProfileDetails?.userSkills || "");
+        setTempProfilePicture(userProfileDetails?.profilePic || "");
+
+        setProfileData(userProfileDetails ? userProfileDetails : {});
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, []);
 
   return (
     <div>
@@ -92,7 +130,7 @@ const ProfilePopup = () => {
                 />
               )}
               <Typography variant="h6">{name}</Typography>
-              <Typography variant="body1">@{username}</Typography>
+              {/* <Typography variant="body1">@{username}</Typography> */}
             </Grid>
             <Grid item xs={12} sm={7}>
               <Typography
@@ -130,10 +168,34 @@ const ProfilePopup = () => {
           </Grid>
           <Dialog open={openReport} onClose={handleCloseReport}>
             <DialogTitle>{"Report Profile"}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
+            <DialogContent sx={{ maxWidth: "230px" }}>
+              <DialogContentText sx={{ marginBottom: "3vh" }}>
                 Please enter your report details.
               </DialogContentText>
+              <FormControl fullWidth>
+                <InputLabel id="report-category-label">
+                  Report Category
+                </InputLabel>
+                <Select
+                  labelId="report-category-label"
+                  id="report-category"
+                  value={reportCategory}
+                  label="Report Category"
+                  onChange={handleCategoryChange}
+                >
+                  <MenuItem value={"hate speech or symbols"}>
+                    Hate Speech or Symbols
+                  </MenuItem>
+                  <MenuItem value={"violence or threat of violence"}>
+                    Violence or Threat of Violence
+                  </MenuItem>
+                  <MenuItem value={"violating intellectual property"}>
+                    Violating Intellectual Property
+                  </MenuItem>
+                  <MenuItem value={"identity theft"}>Identity Theft</MenuItem>
+                  <MenuItem value={"other"}>Other</MenuItem>
+                </Select>
+              </FormControl>
               <TextField
                 autoFocus
                 margin="dense"

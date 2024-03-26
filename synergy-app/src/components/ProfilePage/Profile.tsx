@@ -237,27 +237,29 @@ const Profile = () => {
   useEffect(() => {
     (async () => {
       try {
-        const userSyncData = await getUserDetails(auth.currentUser?.uid || "");
-        // console.log(userSyncData.userEmail);
-        setName(userSyncData?.userName || tempName);
-        setEmail(userSyncData?.userEmail || tempEmail);
-        setAbout(userSyncData?.userAbout || tempAbout);
-        setCompany(userSyncData?.userCompany || tempCompany);
-        setRole(userSyncData?.userType || tempRole);
-        setTempRole(userSyncData?.userType || tempRole);
-        setSkills(userSyncData?.userSkills || tempSkills);
-        setProfilePic(userSyncData?.profilePic || tempProfilePicture);
+        const userProfileDetails = await getUserDetails(
+          auth.currentUser?.uid || ""
+        );
+        // console.log(userProfileDetails.userEmail);
+        setName(userProfileDetails?.userName || tempName);
+        setEmail(userProfileDetails?.userEmail || tempEmail);
+        setAbout(userProfileDetails?.userAbout || tempAbout);
+        setCompany(userProfileDetails?.userCompany || tempCompany);
+        setRole(userProfileDetails?.userType || tempRole);
+        setTempRole(userProfileDetails?.userType || tempRole);
+        setSkills(userProfileDetails?.userSkills || tempSkills);
+        setProfilePic(userProfileDetails?.profilePic || tempProfilePicture);
 
-        console.log("UseEffect", profilePic);
+        // console.log("UseEffect", profilePic);
 
-        // setTempName(userSyncData?.userName || "");
-        // setTempEmail(userSyncData?.userEmail || "");
+        // setTempName(userProfileDetails?.userName || "");
+        // setTempEmail(userProfileDetails?.userEmail || "");
 
-        // userSyncData?.syncId.forEach((sync: any) => {
+        // userProfileDetails?.syncId.forEach((sync: any) => {
         //   syncDataArray.push(sync);
         // });
 
-        setProfileData(userSyncData ? userSyncData : {});
+        setProfileData(userProfileDetails ? userProfileDetails : {});
         // console.log(profileData);
       } catch (err) {
         console.log(err);

@@ -60,7 +60,6 @@ export default function RecentTasks() {
     (async () => {
       try {
         const userTaskData = await getUserSyncData(auth.currentUser?.uid || "");
-        console.log(typeof userTaskData?.syncID);
 
         let taskDataArray: any = [];
 
@@ -69,7 +68,7 @@ export default function RecentTasks() {
         }
 
         setTaskData(taskDataArray);
-        console.log(taskDataArray);
+        // console.log(taskDataArray);
       } catch (err) {
         console.log(err);
       }

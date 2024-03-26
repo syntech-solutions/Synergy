@@ -85,27 +85,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-// const docRef = doc(db, "userDetails");
-// const docSnap = await getDoc(docRef);
-
-// if (docSnap.exists()) {
-//   console.log("Document data:", docSnap.data());
-// } else {
-//   // docSnap.data() will be undefined in this case
-//   console.log("No such document!");
-// }
-
 export default function MainSyncs() {
-  // const [openDialog, setOpenDialog] = React.useState(false);
-
-  // const handleBoxClick = () => {
-  //   setOpenDialog(true);
-  // };
-
-  // const handleCloseDialog = () => {
-  //   setOpenDialog(false);
-  // };
-
   const [open, setOpen] = React.useState(false);
   const [imgURL, setImgURL] = React.useState(
     "https://firebasestorage.googleapis.com/v0/b/synergy-75d4a.appspot.com/o/Logo.png?alt=media&token=81f29e27-e8fd-4cb4-9c00-f083a1cc199a"
@@ -123,7 +103,6 @@ export default function MainSyncs() {
   const [file, setFile] = useState(null);
 
   const handleChange = (e) => {
-    console.log("Clicking Choose file");
     if (e.target.files[0]) {
       setFile(e.target.files[0]);
     }
@@ -136,7 +115,6 @@ export default function MainSyncs() {
     // Upload the file
     try {
       const snapshot = await uploadBytesResumable(storageRef, file);
-      console.log(snapshot);
     } catch (e) {
       console.log(e);
     }
@@ -145,23 +123,11 @@ export default function MainSyncs() {
     try {
       const url = await getDownloadURL(storageRef);
       setImgURL(url);
-      console.log(url);
     } catch (e) {
       console.log(e);
     }
 
-    // Post image inside the db
-
-    // setOpen(false);
     setFile(null);
-
-    // Get metadata
-    // try {
-    //   const metadata = await getMetadata(storageRef);
-    //   console.log(metadata.size);
-    // } catch (e) {
-    //   console.log(e);
-    // }
   };
 
   const createNewSync = async (newSyncForm) => {
@@ -174,13 +140,7 @@ export default function MainSyncs() {
     }
 
     newSyncForm.syncMembers.forEach(async (member: any) => {
-      const memberSyncRef = doc(
-        db,
-        "userData",
-        member.memberID
-        // "syncId",
-        // newSyncRef.id
-      );
+      const memberSyncRef = doc(db, "userData", member.memberID);
 
       try {
         const userDataSyncDetails = {
@@ -195,20 +155,6 @@ export default function MainSyncs() {
       }
     });
 
-    const userSyncRef = doc(db, "userData", auth.currentUser?.uid || "");
-
-    try {
-      const userDataSyncDetails = {
-        syncName: newSyncForm.syncName,
-        syncImage: newSyncForm.syncImage,
-      };
-      await updateDoc(userSyncRef, {
-        [`syncID.${newSyncRef.id}`]: userDataSyncDetails,
-      });
-    } catch (e) {
-      console.log(e);
-    }
-
     setCreatedSync(true);
   };
 
@@ -217,11 +163,12 @@ export default function MainSyncs() {
 
   const [syncData, setSyncData] = useState<any>([]);
 
+  const [syncOwner, setSyncOwner] = useState<any>([]);
+
   useEffect(() => {
     (async () => {
       try {
         const memberData = await getDocData("userDetails");
-        // console.log(memberData);
 
         let membersName: any = [];
 
@@ -231,15 +178,23 @@ export default function MainSyncs() {
               userName: member.userName,
               userEmail: member.userEmail,
               memberID: member.memberID,
+              role: "member",
             });
+          } else if (member.memberID === auth.currentUser?.uid) {
+            const syncOwner = {
+              userName: member.userName,
+              userEmail: member.userEmail,
+              memberID: member.memberID,
+              role: "admin",
+            };
+            // membersName.push(syncOwner);
+            setSyncOwner(syncOwner);
           }
         });
-        console.log(membersName);
 
         setMemberSearch(membersName);
-        // console.log(memberSearch);
       } catch (err) {
-        console.log("Error occured when fetching members list");
+        console.log(err);
       }
     })();
   }, []);
@@ -248,7 +203,6 @@ export default function MainSyncs() {
     (async () => {
       try {
         const userSyncData = await getUserSyncData(auth.currentUser?.uid || "");
-        console.log(typeof userSyncData?.syncID);
 
         let syncDataArray: any = [];
 
@@ -261,7 +215,6 @@ export default function MainSyncs() {
         }
 
         setSyncData(syncDataArray);
-        console.log(syncDataArray);
         setCreatedSync(false);
       } catch (err) {
         console.log(err);
@@ -286,7 +239,14 @@ export default function MainSyncs() {
         elevation={4}
         sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}
       >
-        <Toolbar>
+        <Toolbar
+          sx={{
+            backgroundColor: "#f9f9f1",
+            color: "black",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
           <Typography
             variant="h5"
             color="inherit"
@@ -384,11 +344,13 @@ export default function MainSyncs() {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            console.log(memberArray);
-            formJson.syncMembers = memberArray;
+            memberArray.push(syncOwner);
+
+            formJson.syncMembers = memberArray.map((member: any) => {
+              return { role: member.role, memberID: member.memberID };
+            });
             formJson.syncImage = imgURL;
             formJson.syncOwner = auth.currentUser?.uid;
-            console.log(formJson);
             createNewSync(formJson);
             handleClose();
           },

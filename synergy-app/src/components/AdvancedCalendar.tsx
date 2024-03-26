@@ -12,19 +12,15 @@ import {
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-
-const retrieveHostId = async () => {
-  //implement the database here, for now will return dummy data, matching the DB.
-  return ["HostId", "HostName"];
-};
-const retrieveInvitee = async () => {
-  //implement database use here, for now will return dummy data, matching the DB
-  return { InviteeId1: "InviteeName1", InviteeId2: "InviteeName2" };
-};
+import { getUserDetails } from "./getFunctions";
+import { auth } from "../config/firebase";
+import { useEffect } from "react";
 
 const convertToJSDate = (date: any, time: any) => {
   return moment(`${date}T${time}`).toDate();
 };
+
+const userID = auth.currentUser?.uid || "";
 
 //dummy database data, should be the same as an object from the database
 let dbEvents = {
@@ -143,6 +139,23 @@ export default function ControlCalendar() {
   const handleCloseEventDialog = () => {
     setOpenEventDialog(false);
   };
+
+  const retrieveHostId = async () => {
+    //implement the database here, for now will return dummy data, matching the DB.
+    // const hostDetails = getUserDetails(auth.currentUser?.uid || "");
+    const reqHostDetails = {
+      hostId: userID,
+      hostName: userDetails.userName,
+    };
+    console.log(reqHostDetails);
+    return reqHostDetails;
+  };
+
+  const retrieveInvitee = async () => {
+    //implement database use here, for now will return dummy data, matching the DB
+    return { InviteeId1: "InviteeName1", InviteeId2: "InviteeName2" };
+  };
+
   const saveEventToDB = async (event: any) => {
     try {
       // Generate a unique event ID
@@ -162,7 +175,7 @@ export default function ControlCalendar() {
       // Add the event to dbEvents
       dbEvents = { ...dbEvents, [eventId]: dbEvent };
 
-      console.log("Event saved:", dbEvent);
+      console.log("Event saved:", dbEvents);
 
       return true;
     } catch (error) {
@@ -171,7 +184,7 @@ export default function ControlCalendar() {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     //saving with error conditions
     if (
       !newEvent.title ||
@@ -199,31 +212,62 @@ export default function ControlCalendar() {
       setAlertMessage("The event end time must be after the start time.");
       return;
     }
-    setEvents([
-      ...events,
-      {
+
+    try {
+      const reqUserDetails = await getUserDetails(userID);
+      setUserDetails(reqUserDetails);
+
+      console.log(reqUserDetails);
+
+      const toSetEvents = {
         start: moment(newEvent.start).toDate(),
         end: moment(newEvent.end).toDate(),
         title: newEvent.title,
         data: {
           type: newEvent.data.type,
           description: newEvent.data.description,
-          hostId: retrieveHostId(), //do something with db please
+          hostId: [userID, reqUserDetails.userName], //do something with db please
           inviteeId: retrieveInvitee(),
         },
-      },
-    ]);
-    setNewEvent({
-      start: moment().format("YYYY-MM-DDTHH:mm"),
-      end: moment().format("YYYY-MM-DDTHH:mm"),
-      title: "",
-      data: {
-        type: "Event",
-        description: "",
-      },
-    });
+      };
+
+      console.log(toSetEvents);
+
+      setEvents([...events, toSetEvents]);
+      setNewEvent({
+        start: moment().format("YYYY-MM-DDTHH:mm"),
+        end: moment().format("YYYY-MM-DDTHH:mm"),
+        title: "",
+        data: {
+          hostId: [userID, reqUserDetails.userName], //do something with db please
+          type: "Event",
+          description: "",
+        },
+      });
+
+      console.log(events);
+
+      console.log(newEvent);
+      saveEventToDB(newEvent);
+    } catch (err) {
+      console.log(err);
+    }
+
     setOpenAddEventOverlay(false);
   };
+
+  const [userDetails, setUserDetails] = useState<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const userDetails = await getUserDetails(userID);
+        setUserDetails(userDetails);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, []);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "94vh" }}>

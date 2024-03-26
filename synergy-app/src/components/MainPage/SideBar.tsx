@@ -123,7 +123,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
 
   function handleSelect(selectedButton: any) {
     setSelectedPage(selectedButton);
-    console.log(selectedPage);
+    // console.log(selectedPage);
   }
 
   let navigate = useNavigate();
@@ -158,20 +158,14 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
             edge="start"
             sx={{
               marginRight: 5,
-              ...(open
-                ? { display: "none" }
-                : { display: { xs: "none", sm: "none", md: "flex" } }),
+              ...(open ? { display: "none" } : { display: "flex" }),
             }}
           >
             <MenuIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Drawer
-        variant="permanent"
-        open={open}
-        sx={{ display: { xs: "none", sm: "none", md: "flex" } }}
-      >
+      <Drawer variant="permanent" open={open} sx={{ display: "flex" }}>
         <DrawerHeader>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === "rtl" ? (
@@ -299,7 +293,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
         <DrawerHeader />
         {mainContent}
       </Box>
-      <SimpleBottomNavigation />
+      {/* <SimpleBottomNavigation /> */}
     </Box>
   );
 }

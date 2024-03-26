@@ -10,15 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
     "@mui/x-date-pickers": "^6.19.0",
+    "@types/lodash": "^4.17.0",
+    "@types/uuid": "^9.0.8",
     "axios": "^1.6.8",
     "dayjs": "^1.11.10",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-big-calendar": "^1.11.2",
     "react-dom": "^18.2.0",
     "react-loader-spinner": "^6.1.6",
     "react-router-dom": "^6.21.2",
-    "typeface-roboto": "^1.1.13"
+    "typeface-roboto": "^1.1.13",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

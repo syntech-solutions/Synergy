@@ -27,7 +27,7 @@ export const getUserDetails = async (userID: string) => {
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists()) {
-    // console.log("Document data:", docSnap.data());
+    console.log("Document data:", docSnap.data());
     return docSnap.data();
   } else {
     // docSnap.data() will be undefined in this case
@@ -47,3 +47,29 @@ export const getUserSyncData = async (userID: string) => {
     console.log("No such document!");
   }
 };
+
+export const getSyncData = async (syncID: string) => {
+  const docRef = doc(db, "syncs", syncID);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    console.log("Document data:", docSnap.data());
+    return docSnap.data();
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
+};
+
+// export const getSyncMembersUserDetails = async (memberArray: []) => {
+//   const docRef = doc(db, "syncs", syncID, "syncMembers");
+//   const docSnap = await getDoc(docRef);
+
+//   if (docSnap.exists()) {
+//     console.log("Document data:", docSnap.data());
+//     return docSnap.data();
+//   } else {
+//     // docSnap.data() will be undefined in this case
+//     console.log("No such document!");
+//   }
+// }
