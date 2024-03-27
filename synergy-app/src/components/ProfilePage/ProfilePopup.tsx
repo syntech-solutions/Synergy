@@ -102,116 +102,124 @@ const ProfilePopup = (props: { userID: string; popUp: boolean }) => {
           "& .MuiPaper-root": { color: "#1e394c" },
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-start",
-            margin: "40px",
-            width: "30vw",
-          }}
-        >
-          <Grid container spacing={0}>
-            <Grid
-              item
-              xs={12}
-              sm={4.5}
-              alignItems="center"
-              justifyContent="center"
-            >
-              {tempProfilePicture ? (
-                <Avatar
-                  src={tempProfilePicture}
-                  style={{ height: "8vw", width: "8vw" }}
-                />
-              ) : (
-                <Avatar
-                  alt={name}
-                  style={{ height: "8vw", width: "8vw", marginBottom: "2vh" }}
-                />
-              )}
-              <Typography variant="h6">{name}</Typography>
-              {/* <Typography variant="body1">@{username}</Typography> */}
-            </Grid>
-            <Grid item xs={12} sm={7}>
-              <Typography
-                variant="h6"
-                style={{ marginBottom: "5px", fontWeight: "500" }}
+        <DialogContent>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "flex-start",
+              margin: "40px",
+              width: "30vw",
+            }}
+          >
+            <Grid container spacing={0}>
+              <Grid
+                item
+                xs={12}
+                sm={4.5}
+                alignItems="center"
+                justifyContent="center"
               >
-                Personal Information
-              </Typography>
-              <Typography variant="body1">About: {about}</Typography>
-              <Typography variant="body1" style={{ marginBottom: "1vh" }}>
-                Email: {email}
-              </Typography>
-              <Typography variant="body1"> Organisation: {company}</Typography>
-              <Typography variant="body1">Role: {role}</Typography>
-              <Typography variant="body1" style={{ marginBottom: "2vh" }}>
-                Skills: {skills}
-              </Typography>
-              <IconButton onClick={handleOpenReport} style={{ padding: "0px" }}>
-                <Box
-                  bgcolor="#0c2b4b"
-                  color="white"
-                  style={{
-                    padding: "10px",
-                    fontSize: "0.9rem",
-                    display: "flex",
-                    alignItems: "center",
-                    borderRadius: "5px",
-                  }}
+                {tempProfilePicture ? (
+                  <Avatar
+                    src={tempProfilePicture}
+                    style={{ height: "8vw", width: "8vw" }}
+                  />
+                ) : (
+                  <Avatar
+                    alt={name}
+                    style={{ height: "8vw", width: "8vw", marginBottom: "2vh" }}
+                  />
+                )}
+                <Typography variant="h6">{name}</Typography>
+                {/* <Typography variant="body1">@{username}</Typography> */}
+              </Grid>
+              <Grid item xs={12} sm={7}>
+                <Typography
+                  variant="h6"
+                  style={{ marginBottom: "5px", fontWeight: "500" }}
                 >
-                  <ReportProblemIcon style={{ marginRight: "6px" }} />
-                  Report User
-                </Box>
-              </IconButton>
+                  Personal Information
+                </Typography>
+                <Typography variant="body1">About: {about}</Typography>
+                <Typography variant="body1" style={{ marginBottom: "1vh" }}>
+                  Email: {email}
+                </Typography>
+                <Typography variant="body1">
+                  {" "}
+                  Organisation: {company}
+                </Typography>
+                <Typography variant="body1">Role: {role}</Typography>
+                <Typography variant="body1" style={{ marginBottom: "2vh" }}>
+                  Skills: {skills}
+                </Typography>
+                <IconButton
+                  onClick={handleOpenReport}
+                  style={{ padding: "0px" }}
+                >
+                  <Box
+                    bgcolor="#0c2b4b"
+                    color="white"
+                    style={{
+                      padding: "10px",
+                      fontSize: "0.9rem",
+                      display: "flex",
+                      alignItems: "center",
+                      borderRadius: "5px",
+                    }}
+                  >
+                    <ReportProblemIcon style={{ marginRight: "6px" }} />
+                    Report User
+                  </Box>
+                </IconButton>
+              </Grid>
             </Grid>
-          </Grid>
-          <Dialog open={openReport} onClose={handleCloseReport}>
-            <DialogTitle>{"Report Profile"}</DialogTitle>
-            <DialogContent sx={{ maxWidth: "230px" }}>
-              <DialogContentText sx={{ marginBottom: "3vh" }}>
-                Please enter your report details.
-              </DialogContentText>
-              <FormControl fullWidth>
-                <InputLabel id="report-category-label">
-                  Report Category
-                </InputLabel>
-                <Select
-                  labelId="report-category-label"
-                  id="report-category"
-                  value={reportCategory}
-                  label="Report Category"
-                  onChange={handleCategoryChange}
-                >
-                  <MenuItem value={"hate speech or symbols"}>
-                    Hate Speech or Symbols
-                  </MenuItem>
-                  <MenuItem value={"violence or threat of violence"}>
-                    Violence or Threat of Violence
-                  </MenuItem>
-                  <MenuItem value={"violating intellectual property"}>
-                    Violating Intellectual Property
-                  </MenuItem>
-                  <MenuItem value={"identity theft"}>Identity Theft</MenuItem>
-                  <MenuItem value={"other"}>Other</MenuItem>
-                </Select>
-              </FormControl>
-              <TextField
-                autoFocus
-                margin="dense"
-                id="report"
-                label="Report Details"
-                type="text"
-                fullWidth
-                variant="standard"
-              />
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleCloseReport}>Cancel</Button>
-              <Button onClick={handleCloseReport}>Report</Button>
-            </DialogActions>
-          </Dialog>
-        </Box>
+            <Dialog open={openReport} onClose={handleCloseReport}>
+              <DialogTitle>{"Report Profile"}</DialogTitle>
+              <DialogContent sx={{ maxWidth: "230px" }}>
+                <DialogContentText sx={{ marginBottom: "3vh" }}>
+                  Please enter your report details.
+                </DialogContentText>
+                <FormControl fullWidth>
+                  <InputLabel id="report-category-label">
+                    Report Category
+                  </InputLabel>
+                  <Select
+                    labelId="report-category-label"
+                    id="report-category"
+                    value={reportCategory}
+                    label="Report Category"
+                    onChange={handleCategoryChange}
+                  >
+                    <MenuItem value={"hate speech or symbols"}>
+                      Hate Speech or Symbols
+                    </MenuItem>
+                    <MenuItem value={"violence or threat of violence"}>
+                      Violence or Threat of Violence
+                    </MenuItem>
+                    <MenuItem value={"violating intellectual property"}>
+                      Violating Intellectual Property
+                    </MenuItem>
+                    <MenuItem value={"identity theft"}>Identity Theft</MenuItem>
+                    <MenuItem value={"other"}>Other</MenuItem>
+                  </Select>
+                </FormControl>
+                <TextField
+                  autoFocus
+                  margin="dense"
+                  id="report"
+                  label="Report Details"
+                  type="text"
+                  fullWidth
+                  variant="standard"
+                />
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleCloseReport}>Cancel</Button>
+                <Button onClick={handleCloseReport}>Report</Button>
+              </DialogActions>
+            </Dialog>
+          </Box>
+        </DialogContent>
       </Dialog>
     </div>
   );

@@ -14,7 +14,7 @@ import SignUp from "../components/LandingPage/SignUp";
 import MainSyncs from "../components/Syncs/main-syncs (1)";
 import Profile from "../components/ProfilePage/Profile";
 import PeopleMain from "../components/PeopleMain/PeopleMain";
-import AdvancedCalendar from "../components/AdvancedCalendar";
+import AdvancedCalendar from "../components/Calendar/AdvancedCalendar";
 import SyncsPage from "../components/Syncs/syncspage";
 
 const routes: RouteObject[] = [

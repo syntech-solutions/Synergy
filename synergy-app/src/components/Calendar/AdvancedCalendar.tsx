@@ -9,12 +9,14 @@ import {
   DialogTitle,
   DialogContent,
   DialogContentText,
+  Autocomplete,
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { getUserDetails } from "./getFunctions";
-import { auth } from "../config/firebase";
+import { getDocData, getUserDetails, getUserSyncData } from "../getFunctions";
+import { auth, db } from "../../config/firebase";
 import { useEffect } from "react";
+import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
 
 const convertToJSDate = (date: any, time: any) => {
   return moment(`${date}T${time}`).toDate();
@@ -23,26 +25,28 @@ const convertToJSDate = (date: any, time: any) => {
 const userID = auth.currentUser?.uid || "";
 
 //dummy database data, should be the same as an object from the database
-let dbEvents = {
-  event1: {
-    hostID: ["hostId1", "HostName1"],
-    inviteeID: new Map([["userId1", "userName1"]]),
-    eventTitle: "Line Manager Meeting",
-    eventDesc: "Event",
-    eventDate: "2024-02-12",
-    eventSTime: "10:00:00",
-    eventETime: "11:00:00",
-  },
-  event2: {
-    hostID: ["hostId2", "HostName2"],
-    inviteeID: new Map([["userId2", "userName2"]]),
-    eventTitle: "Finish Calendar Component",
-    eventDesc: "Task",
-    eventDate: "2024-02-18",
-    eventSTime: "14:00:00",
-    eventETime: "15:30:00",
-  },
-};
+// let dbEvents = {
+//   event1: {
+//     hostID: ["hostId1", "HostName1"],
+//     inviteeID: new Map([["userId1", "userName1"]]),
+//     eventTitle: "Line Manager Meeting",
+//     eventDesc: "Event",
+//     eventDate: "2024-02-12",
+//     eventSTime: "10:00:00",
+//     eventETime: "11:00:00",
+//   },
+//   event2: {
+//     hostID: ["hostId2", "HostName2"],
+//     inviteeID: new Map([["userId2", "userName2"]]),
+//     eventTitle: "Finish Calendar Component",
+//     eventDesc: "Task",
+//     eventDate: "2024-02-18",
+//     eventSTime: "14:00:00",
+//     eventETime: "15:30:00",
+//   },
+// };
+
+const [dbEvents, setDbEvents] = useState<any>(null);
 
 //taking event from dbEvents and converting it to the format used in the calendar
 const initialEvents = Object.values(dbEvents).map((event) => ({
@@ -50,10 +54,11 @@ const initialEvents = Object.values(dbEvents).map((event) => ({
   end: convertToJSDate(event.eventDate, event.eventETime),
   title: event.eventTitle,
   data: {
-    type: event.eventDesc,
+    desc: event.eventDesc,
     description: event.eventTitle,
     hostId: event.hostID,
     inviteeId: Array.from(event.inviteeID.entries()),
+    type: event.eventType,
   },
 }));
 
@@ -122,6 +127,8 @@ export default function ControlCalendar() {
       description: "",
     },
   });
+  const [memberSearch, setMemberSearch] = useState([]);
+  const [memberArray, setMemberArray] = useState<any>([]);
 
   const handleClickOpen = () => {
     setOpenAddEventOverlay(true);
@@ -161,19 +168,35 @@ export default function ControlCalendar() {
       // Generate a unique event ID
       const eventId = `event${Object.keys(dbEvents).length + 1}`;
 
+      console.log(event);
+
       // Convert the event to the format used in dbEvents
       const dbEvent = {
-        hostID: event.data.hostId,
-        inviteeID: new Map(event.data.inviteeId),
+        hostDetails: event.data.hostDetails,
+        inviteeDetails: event.data.inviteeDetails,
         eventTitle: event.title,
-        eventDesc: event.data.type,
+        eventDesc: event.data.description,
         eventDate: moment(event.start).format("YYYY-MM-DD"),
         eventSTime: moment(event.start).format("HH:mm:ss"),
         eventETime: moment(event.end).format("HH:mm:ss"),
+        eventType: "Event",
       };
+      console.log("Event saved:", dbEvent);
+
+      const eventRef = doc(db, "userData", userID);
+
+      try {
+        await updateDoc(eventRef, {
+          events: {
+            [eventId]: dbEvent,
+          },
+        });
+      } catch (e) {
+        console.log(e);
+      }
 
       // Add the event to dbEvents
-      dbEvents = { ...dbEvents, [eventId]: dbEvent };
+      setDbEvents({ ...setDbEvents, [eventId]: dbEvent });
 
       console.log("Event saved:", dbEvents);
 
@@ -217,7 +240,11 @@ export default function ControlCalendar() {
       const reqUserDetails = await getUserDetails(userID);
       setUserDetails(reqUserDetails);
 
-      console.log(reqUserDetails);
+      // console.log(reqUserDetails);
+
+      const inviteeArray = memberArray.map((member: any) => {
+        return { inviteeID: member.memberID, inviteeName: member.userName };
+      });
 
       const toSetEvents = {
         start: moment(newEvent.start).toDate(),
@@ -226,10 +253,12 @@ export default function ControlCalendar() {
         data: {
           type: newEvent.data.type,
           description: newEvent.data.description,
-          hostId: [userID, reqUserDetails.userName], //do something with db please
-          inviteeId: retrieveInvitee(),
+          hostDetails: { hostID: userID, hostName: reqUserDetails.userName }, //do something with db please
+          inviteeDetails: inviteeArray,
         },
       };
+
+      console.log(memberArray);
 
       console.log(toSetEvents);
 
@@ -239,7 +268,7 @@ export default function ControlCalendar() {
         end: moment().format("YYYY-MM-DDTHH:mm"),
         title: "",
         data: {
-          hostId: [userID, reqUserDetails.userName], //do something with db please
+          // hostId: [userID, reqUserDetails.userName], //do something with db please
           type: "Event",
           description: "",
         },
@@ -248,7 +277,7 @@ export default function ControlCalendar() {
       console.log(events);
 
       console.log(newEvent);
-      saveEventToDB(newEvent);
+      saveEventToDB(toSetEvents);
     } catch (err) {
       console.log(err);
     }
@@ -261,8 +290,44 @@ export default function ControlCalendar() {
   useEffect(() => {
     (async () => {
       try {
-        const userDetails = await getUserDetails(userID);
-        setUserDetails(userDetails);
+        const reqUserDetails = await getUserDetails(userID);
+        setUserDetails(reqUserDetails);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const memberData = await getDocData("userDetails");
+
+        let membersName: any = [];
+
+        memberData?.forEach((member: any) => {
+          if (member.memberID !== auth.currentUser?.uid) {
+            membersName.push({
+              userName: member.userName,
+              userEmail: member.userEmail,
+              memberID: member.memberID,
+            });
+          }
+        });
+
+        setMemberSearch(membersName);
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const reqUserData = await getUserSyncData(userID);
+        setDbEvents({ ...dbEvents, ...reqUserData.events });
+        console.log(dbEvents);
       } catch (err) {
         console.log(err);
       }
@@ -273,7 +338,7 @@ export default function ControlCalendar() {
     <div style={{ display: "flex", flexDirection: "column", height: "94vh" }}>
       <div style={{ flex: "1 0 auto" }}>
         <Calendar
-          events={events}
+          events={dbEvents}
           components={components}
           onSelectEvent={handleEventClick}
         />
@@ -409,6 +474,28 @@ export default function ControlCalendar() {
               })
             }
             required
+          />
+          <Autocomplete
+            fullWidth={true}
+            multiple
+            id="tags-standard"
+            // name="syncDesc"
+            // type="syncDesc"
+            options={memberSearch}
+            getOptionLabel={(option) => option.userName}
+            // defaultValue={[top100Films[13]]}
+            // filterSelectedOptions
+            onChange={(events, value) => setMemberArray(value)}
+            renderInput={(params) => (
+              <TextField
+                margin="dense"
+                {...params}
+                variant="standard"
+                label="Add Members"
+                placeholder="Members"
+                type="member"
+              />
+            )}
           />
         </DialogContent>
 

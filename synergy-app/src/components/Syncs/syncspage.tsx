@@ -32,7 +32,12 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getDocData, getSyncData, getUserDetails } from "../getFunctions";
+import {
+  getDocData,
+  getSyncData,
+  getUserDetails,
+  getUserSyncData,
+} from "../getFunctions";
 import { auth, db } from "../../config/firebase";
 import ProfilePopup from "../ProfilePage/ProfilePopup";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
@@ -69,7 +74,7 @@ function SyncsPage(props: any) {
   const [syncLeader, setSyncLeader] = React.useState("Leader Name");
   const [newMemberName, setNewMemberName] = React.useState("");
   const [isAddMemberDialogOpen, setAddMemberDialogOpen] = React.useState(false);
-  const [isMemberEditMode, setMemberEditMode] = React.useState(false);
+  const [isMemberEditMode, setMemberEditMode] = React.useState(true);
   const [isSubSyncEditMode, setSubSyncEditMode] = React.useState(false);
   const [tabValue, setTabValue] = React.useState(0);
   const [selectedMemberIndex, setSelectedMemberIndex] = React.useState(null);
@@ -82,16 +87,42 @@ function SyncsPage(props: any) {
   const [subSyncName, setSubSyncName] = React.useState("");
   const [selectedMembers, setSelectedMembers] = React.useState([]);
   const [secondary] = React.useState(false);
-  const [subSyncs, setSubSyncs] = React.useState([]);
+  const [subSyncs] = React.useState([]);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [selectedIndex, setSelectedIndex] = React.useState(null);
   const [isManageMembersDialogOpen, setManageMembersDialogOpen] =
     React.useState(false);
   const [selectedSubSyncIndex, setSelectedSubSyncIndex] = React.useState(null);
 
-  const handleDeleteMember = (index: any) => {
+  const handleDeleteMember = async (index: any, memberId: any) => {
+    try {
+      const docData = await getUserSyncData(memberId);
+      const tempData = { ...docData };
+      console.log(tempData);
+      delete tempData.syncID[id];
+      const userDataRef = doc(db, "userData", memberId);
+      await updateDoc(userDataRef, tempData);
+    } catch (e) {
+      console.log(e);
+    }
+
+    const syncRef = doc(db, "syncs", id);
+
+    try {
+      const docData = await getSyncData(id);
+      const tempData = { ...docData };
+      console.log(tempData.syncMembers);
+      const updatedMembers = tempData.syncMembers.filter(
+        (member: any) => member.memberID !== memberId
+      );
+      await updateDoc(syncRef, { syncMembers: updatedMembers });
+    } catch (e) {
+      console.log(e);
+    }
+
     setSelectedMemberIndex(index);
     setMemberDeleteConfirmationOpen(true);
+    setMemberEditMode(false);
   };
 
   const removeMemberFromSubSyncs = (memberIndex: any) => {
@@ -101,7 +132,7 @@ function SyncsPage(props: any) {
       );
       return { ...subSync, members: updatedMembers };
     });
-    setSubSyncs(updatedSubSyncs);
+    updatedSubSyncs;
   };
 
   const handleCancelDelete = () => {
@@ -220,7 +251,7 @@ function SyncsPage(props: any) {
         handleCloseMenu(); // Close the menu
         break;
       case "remove member":
-        handleDeleteMember(index);
+        handleDeleteMember(index, id);
         break;
       case "make admin":
         handleMakeAdmin(index);
@@ -392,23 +423,28 @@ function SyncsPage(props: any) {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <Box
+        // component="nav"
         sx={{
           display: "flex",
-          // width: "100%",
+          width: "100%",
           borderBottom: "2px solid #dcdcdc",
           backgroundColor: "#f9f9f1",
           position: "fixed",
-          zIndex: 1,
-          // maxWidth: "%",
-          // display: "flex",
+
           flexDirection: "row",
           justifyContent: "flex-end",
           flexWrap: "wrap",
+          overflow: "auto",
+          // zIndex: 1,
+          // maxWidth: "%",
+          // display: "flex",
+
           // mt: { xs: 4, sm: 4, md: 4 },
           // mr: { xs: 4, sm: 4, md: 4, lg: 4, xl: 4 },
-          flexGrow: 1,
+          // flexGrow: 1,
           // p: 3,
-          width: { sm: `calc(100% - ${toolbarWidth}px)` },
+          // width: { sm: `calc(100% - ${toolbarWidth}px)` },
+          // maxWidth: "100%",
         }}
       >
         <Toolbar
@@ -468,7 +504,7 @@ function SyncsPage(props: any) {
             >
               Members
             </Typography>
-            {members.length > 1 && syncOwner === auth.currentUser?.uid && (
+            {/* {members.length > 1 && syncOwner === auth.currentUser?.uid && (
               <EditIcon
                 sx={{
                   color: "#EE964B",
@@ -478,7 +514,7 @@ function SyncsPage(props: any) {
                 }}
                 onClick={handleMemberEditToggle}
               />
-            )}
+            )} */}
             <AddBoxIcon
               sx={{
                 color: "#EE964B",
@@ -518,21 +554,23 @@ function SyncsPage(props: any) {
                               }
                               onClose={handleCloseMenu}
                             >
-                              {member.role === "member" && (
-                                <MenuItem
-                                  onClick={() =>
-                                    handleMenuAction(
-                                      "make admin",
-                                      index,
-                                      member.memberID
-                                    )
-                                  }
-                                >
-                                  Make Admin
-                                </MenuItem>
-                              )}
+                              {member.role === "member" &&
+                                auth.currentUser?.uid === syncOwner && (
+                                  <MenuItem
+                                    onClick={() =>
+                                      handleMenuAction(
+                                        "make admin",
+                                        index,
+                                        member.memberID
+                                      )
+                                    }
+                                  >
+                                    Make Admin
+                                  </MenuItem>
+                                )}
                               {member.role === "admin" &&
-                                member.userName !== syncLeader && (
+                                member.userName !== syncLeader &&
+                                auth.currentUser?.uid === syncOwner && (
                                   <MenuItem
                                     onClick={() =>
                                       handleMenuAction(
@@ -545,17 +583,19 @@ function SyncsPage(props: any) {
                                     Remove Admin
                                   </MenuItem>
                                 )}
-                              <MenuItem
-                                onClick={() =>
-                                  handleMenuAction(
-                                    "remove member",
-                                    index,
-                                    member.memberID
-                                  )
-                                }
-                              >
-                                Remove Member
-                              </MenuItem>
+                              {auth.currentUser?.uid === syncOwner && (
+                                <MenuItem
+                                  onClick={() =>
+                                    handleMenuAction(
+                                      "remove member",
+                                      index,
+                                      member.memberID
+                                    )
+                                  }
+                                >
+                                  Remove Member
+                                </MenuItem>
+                              )}
                               <MenuItem
                                 onClick={() =>
                                   handleMenuAction(
@@ -663,7 +703,7 @@ function SyncsPage(props: any) {
                             >
                               <MenuItem
                                 onClick={() =>
-                                  handleMenuAction("manage members", index)
+                                  handleMenuAction("manage members", index, "")
                                 }
                               >
                                 Manage Members
@@ -681,7 +721,7 @@ function SyncsPage(props: any) {
                       <ListItemText
                         primary={subSync.name}
                         secondary={`Members: ${subSync.members
-                          .map((member) => member.userName)
+                          .map((member: any) => member.userName)
                           .join(", ")}`}
                       />
                     </ListItem>
@@ -964,10 +1004,10 @@ function SyncsPage(props: any) {
                   height: "100%",
                   border: "1px solid #ccc",
                   padding: "10px",
-                  display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                   flexWrap: "wrap",
+                  display: "flex",
                 }}
               >
                 <Typography
