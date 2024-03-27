@@ -17,7 +17,7 @@ import { useEffect } from "react";
 import { getDocData, getUserDetails, getUserSyncData } from "../getFunctions";
 import { auth, db } from "../../config/firebase";
 import { doc, updateDoc } from "firebase/firestore";
-
+import "./Calendar.css";
 // const retrieveHostId = async () => {
 //   //implement the database here, for now will return dummy data, matching the DB.
 //   return ["HostId", "HostName"];

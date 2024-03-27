@@ -7,7 +7,14 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { FirebaseError } from "@firebase/util";
-import { doc, setDoc } from "firebase/firestore"; // Import the necessary package
+import {
+  collection,
+  doc,
+  getCountFromServer,
+  getDoc,
+  getDocs,
+  setDoc,
+} from "firebase/firestore"; // Import the necessary package
 import {
   Box,
   Button,
@@ -164,6 +171,67 @@ const SignUp = () => {
     } catch (e) {
       console.error(e);
     }
+
+    const newChat = collection(db, "chats");
+    const newChatSnap = await getCountFromServer(newChat);
+
+    let getTotalChatsOfUserSender = newChatSnap.data().count + 1; //for getting messages for user to assign apropraite name
+    const newMassageNameToStringSender =
+      "C" + getTotalChatsOfUserSender.toString();
+
+    const usersRef = collection(db, "userData");
+    //const uid = auth.currentUser?.uid;
+    //const docIdToExclude = uid; // replace with your document ID to exclude
+    const querySnapshot = await getDocs(usersRef); // replace with your collection name
+    let userIDArr = [];
+
+    querySnapshot.forEach((doc) => {
+      //if (doc.id !== docIdToExclude) {
+      console.log(doc.id, " => ", doc.data());
+      userIDArr.push(doc.id);
+      //}
+    });
+
+    console.log("id: " + userIDArr);
+    const chatMap = [];
+    const chatMap2 = [];
+
+    for (let i = 0; i < userIDArr.length; i++) {
+      //const getTotalChatsOfUserSender = newChatSnap.data().count + 1; //for getting messages for user to assign apropraite name
+      getTotalChatsOfUserSender++;
+      const newMassageNameToStringSender =
+        "C" + getTotalChatsOfUserSender.toString();
+      chatMap.push({ [newMassageNameToStringSender]: [userIDArr[i]] });
+
+      let usersDetailsRef = doc(db, "userDetails", userIDArr[i]);
+      let docSnap = await getDoc(usersDetailsRef);
+      let n = docSnap.data()?.userName;
+      console.log(n);
+
+      //chatMap2.push({Participants: [userIDArr[i]]});
+      let p = new Map([
+        [userId, [name, name[0]]],
+        [userIDArr[i], [n, n[0]]],
+      ]);
+
+      let obj = Object.fromEntries(p);
+      chatMap2.push(obj);
+      await setDoc(doc(newChat, newMassageNameToStringSender), {
+        Participants: obj,
+      });
+      const newCollectionRef = collection(
+        db,
+        "chats",
+        newMassageNameToStringSender,
+        "Messages"
+      );
+      const firstmessage = "M0";
+
+      await setDoc(doc(newCollectionRef, firstmessage), {
+        data: "Hello there World",
+      });
+    }
+
     const userIdRef = doc(db, "userDetails", userId);
     try {
       const userData = {

@@ -1,0 +1,28 @@
+.rbc-header {
+  font-family: "Roboto", sans-serif;
+  background: #0c2c4b;
+  color: white;
+  font-weight: bold;
+}
+
+.rbc-toolbar-label {
+  font-family: "Roboto", sans-serif;
+  font-weight: bold;
+}
+
+.rbc-agenda-time-cell,
+.rbc-agenda-event-cell,
+.rbc-agenda-date-cell {
+  font-family: "Roboto", sans-serif !important;
+  font-weight: 600 !important;
+}
+
+/* Base button style */
+.rbc-toolbar button {
+  display: inline-block !important;
+  padding: 10px 20px !important;
+  font-family: "Roboto", sans-serif !important;
+  font-weight: bold !important;
+  background-color: #124374 !important; /* Slightly lighter than #0c2c4b */
+  color: white !important;
+}
