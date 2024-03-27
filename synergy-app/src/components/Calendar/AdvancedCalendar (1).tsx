@@ -13,51 +13,60 @@ import {
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
+import { useEffect } from "react";
 import { getDocData, getUserDetails, getUserSyncData } from "../getFunctions";
 import { auth, db } from "../../config/firebase";
-import { useEffect } from "react";
-import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc } from "firebase/firestore";
+
+// const retrieveHostId = async () => {
+//   //implement the database here, for now will return dummy data, matching the DB.
+//   return ["HostId", "HostName"];
+// };
+// const retrieveInvitee = async () => {
+//   //implement database use here, for now will return dummy data, matching the DB
+//   return { InviteeId1: "InviteeName1", InviteeId2: "InviteeName2" };
+// };
 
 const convertToJSDate = (date: any, time: any) => {
   return moment(`${date}T${time}`).toDate();
 };
 
-const userID = auth.currentUser?.uid || "";
-
 //dummy database data, should be the same as an object from the database
 let dbEvents = {
-  event1: {
-    hostID: ["hostId1", "HostName1"],
-    inviteeID: new Map([["userId1", "userName1"]]),
-    eventTitle: "Line Manager Meeting",
-    eventDesc: "Event",
-    eventDate: "2024-02-12",
-    eventSTime: "10:00:00",
-    eventETime: "11:00:00",
-  },
-  event2: {
-    hostID: ["hostId2", "HostName2"],
-    inviteeID: new Map([["userId2", "userName2"]]),
-    eventTitle: "Finish Calendar Component",
-    eventDesc: "Task",
-    eventDate: "2024-02-18",
-    eventSTime: "14:00:00",
-    eventETime: "15:30:00",
-  },
+  // event1: {
+  //   hostDetails: { hostID: "hostId1", hostName: "HostName1" },
+  //   inviteeDetails: [{ inviteeID: "userId1", inviteeName: "userName1" }],
+  //   eventTitle: "Line Manager Meeting",
+  //   eventType: "Event",
+  //   eventDate: "2024-02-12",
+  //   eventSTime: "10:00:00",
+  //   eventETime: "11:00:00",
+  //   eventDesc: "Meeting with Line Manager to discuss project progress",
+  // },
+  // event2: {
+  //   hostDetails: { hostID: "hostId2", hostName: "HostName2" },
+  //   inviteeDetails: [{ inviteeID: "userId1", inviteeName: "userName1" }],
+  //   eventTitle: "Finish Calendar Component",
+  //   eventType: "Task",
+  //   eventDate: "2024-02-18",
+  //   eventSTime: "14:00:00",
+  //   eventETime: "15:30:00",
+  //   eventDesc: "Finish the calendar component for the project",
+  // },
 };
 
 //taking event from dbEvents and converting it to the format used in the calendar
-const initialEvents = Object.values(dbEvents).map((event) => ({
-  start: convertToJSDate(event.eventDate, event.eventSTime),
-  end: convertToJSDate(event.eventDate, event.eventETime),
-  title: event.eventTitle,
-  data: {
-    type: event.eventDesc,
-    description: event.eventTitle,
-    // hostId: event.hostID,
-    // inviteeId: Array.from(event.inviteeID.entries()),
-  },
-}));
+// const initialEvents = Object.values(dbEvents).map((event) => ({
+//   start: convertToJSDate(event.eventDate, event.eventSTime),
+//   end: convertToJSDate(event.eventDate, event.eventETime),
+//   title: event.eventTitle,
+//   data: {
+//     type: event.eventType,
+//     description: event.eventDesc,
+//     hostDetails: event.hostDetails,
+//     inviteeDetails: event.inviteeDetails,
+//   },
+// }));
 
 const components = {
   event: (props: any) => {
@@ -110,12 +119,11 @@ const components = {
 };
 
 export default function ControlCalendar() {
-  const [dbEvents, setDbEvents] = useState<any>(null);
-  const [events, setEvents] = useState(dbEvents);
+  const [events, setEvents] = useState();
   const [openAddEventOverlay, setOpenAddEventOverlay] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [openEventDialog, setOpenEventDialog] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
+  const [alertMessage, setAlertMessage] = useState(null);
   const [newEvent, setNewEvent] = useState({
     start: moment().format("YYYY-MM-DDTHH:mm"),
     end: moment().format("YYYY-MM-DDTHH:mm"),
@@ -125,8 +133,8 @@ export default function ControlCalendar() {
       description: "",
     },
   });
-  const [memberSearch, setMemberSearch] = useState([]);
-  const [memberArray, setMemberArray] = useState<any>([]);
+
+  const userID = auth.currentUser?.uid;
 
   const handleClickOpen = () => {
     setOpenAddEventOverlay(true);
@@ -144,58 +152,48 @@ export default function ControlCalendar() {
   const handleCloseEventDialog = () => {
     setOpenEventDialog(false);
   };
-
-  const retrieveHostId = async () => {
-    //implement the database here, for now will return dummy data, matching the DB.
-    // const hostDetails = getUserDetails(auth.currentUser?.uid || "");
-    const reqHostDetails = {
-      hostId: userID,
-      hostName: userDetails.userName,
-    };
-    console.log(reqHostDetails);
-    return reqHostDetails;
-  };
-
-  const retrieveInvitee = async () => {
-    //implement database use here, for now will return dummy data, matching the DB
-    return { InviteeId1: "InviteeName1", InviteeId2: "InviteeName2" };
-  };
-
   const saveEventToDB = async (event: any) => {
     try {
       // Generate a unique event ID
-      const eventId = `event${Object.keys(dbEvents).length + 1}`;
-
-      console.log(event);
+      const eventId = `event${numOfEvents + 1}`;
 
       // Convert the event to the format used in dbEvents
       const dbEvent = {
         hostDetails: event.data.hostDetails,
         inviteeDetails: event.data.inviteeDetails,
         eventTitle: event.title,
+        eventType: event.data.type,
         eventDesc: event.data.description,
         eventDate: moment(event.start).format("YYYY-MM-DD"),
         eventSTime: moment(event.start).format("HH:mm:ss"),
         eventETime: moment(event.end).format("HH:mm:ss"),
       };
-      console.log("Event saved:", dbEvent);
 
-      const eventRef = doc(db, "userData", userID);
+      const memberRef = doc(db, "userData", userID);
 
       try {
-        await updateDoc(eventRef, {
-          events: {
-            [eventId]: dbEvent,
-          },
+        await updateDoc(memberRef, {
+          [`eventID.${eventId}`]: dbEvent,
         });
       } catch (e) {
         console.log(e);
       }
 
-      // Add the event to dbEvents
-      setDbEvents({ ...setDbEvents, [eventId]: dbEvent });
+      event.data.inviteeDetails.map((member: any) => {
+        const inviteeRef = doc(db, "userData", member.inviteeID);
+        try {
+          updateDoc(inviteeRef, {
+            [`eventID.${eventId}`]: dbEvent,
+          });
+        } catch (err) {
+          console.log(err);
+        }
+      });
 
-      console.log("Event saved:", dbEvents);
+      // Add the event to dbEvents
+      // dbEvents = { ...dbEvents, [eventId]: dbEvent };
+
+      console.log("Event saved:", dbEvent);
 
       return true;
     } catch (error) {
@@ -233,6 +231,11 @@ export default function ControlCalendar() {
       return;
     }
 
+    // setNewEvent({
+    //   ...newEvent,
+    //   data: { ...newEvent.data, inviteeDetails: e.target.value },
+    // });
+
     try {
       const reqUserDetails = await getUserDetails(userID);
       setUserDetails(reqUserDetails);
@@ -251,50 +254,36 @@ export default function ControlCalendar() {
           type: newEvent.data.type,
           description: newEvent.data.description,
           hostDetails: { hostID: userID, hostName: reqUserDetails.userName }, //do something with db please
+          // hostId: retrieveHostId(), //do something with db please
           inviteeDetails: inviteeArray,
+          // inviteeId: retrieveInvitee(),
         },
       };
 
-      const toInitEvents = {
-        start: moment(newEvent.start).toDate(),
-        end: moment(newEvent.end).toDate(),
-        title: newEvent.title,
-        data: {
-          type: newEvent.data.type,
-          description: newEvent.data.description,
-          // hostDetails: { hostID: userID, hostName: reqUserDetails.userName }, //do something with db please
-          // inviteeDetails: inviteeArray,
-        },
-      };
+      // console.log([...events, toSetEvents]);
 
-      console.log(memberArray);
+      saveEventToDB(toSetEvents);
 
-      console.log(toSetEvents);
-
-      // setEvents([...events, toInitEvents]);
+      // setEvents([...events, toSetEvents]);
       setNewEvent({
         start: moment().format("YYYY-MM-DDTHH:mm"),
         end: moment().format("YYYY-MM-DDTHH:mm"),
         title: "",
         data: {
-          // hostId: [userID, reqUserDetails.userName], //do something with db please
           type: "Event",
           description: "",
         },
       });
-
-      console.log(events);
-
-      console.log(newEvent);
-      saveEventToDB(toSetEvents);
     } catch (err) {
       console.log(err);
     }
-
     setOpenAddEventOverlay(false);
   };
 
+  const [memberSearch, setMemberSearch] = useState([]);
+  const [memberArray, setMemberArray] = useState<any>([]);
   const [userDetails, setUserDetails] = useState<any>(null);
+  const [numOfEvents, setNoOfEvents] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -335,8 +324,27 @@ export default function ControlCalendar() {
     (async () => {
       try {
         const reqUserData = await getUserSyncData(userID);
-        // setDbEvents({ ...dbEvents, ...reqUserData.events });
-        console.log(dbEvents);
+        const reqDbEvents = reqUserData.eventID;
+        const eventArray: any = [];
+        Object.entries(reqDbEvents).forEach(([key, value]) => {
+          eventArray.push({
+            start: convertToJSDate(
+              value.eventDate as string,
+              value.eventSTime as string
+            ),
+            end: convertToJSDate(value.eventDate, value.eventETime),
+            title: value.eventTitle,
+            data: {
+              type: value.eventType,
+              description: value.eventDesc,
+              hostDetails: value.hostDetails,
+              inviteeDetails: value.inviteeDetails,
+            },
+          });
+        });
+        // console.log(eventArray);
+        setNoOfEvents(eventArray.length);
+        setEvents(eventArray);
       } catch (err) {
         console.log(err);
       }
@@ -484,6 +492,7 @@ export default function ControlCalendar() {
             }
             required
           />
+
           <Autocomplete
             fullWidth={true}
             multiple

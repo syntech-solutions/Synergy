@@ -171,7 +171,7 @@ const SignUp = () => {
         syncID: {},
         chatID: {},
         projectID: {},
-        EventID: {},
+        eventID: {},
         taskID: {},
         brainBoardID: {},
         whiteBoardID: {},
