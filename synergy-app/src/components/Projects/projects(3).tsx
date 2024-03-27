@@ -29,6 +29,27 @@ import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import Divider from "@mui/material/Divider";
 import { v4 as uuidv4 } from "uuid";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
+import {
+  getDocData,
+  getProjectsData,
+  getSyncData,
+  getTaskData,
+  getTasksData,
+  getUserDetails,
+  getUserSyncData,
+} from "../getFunctions";
+import { auth, db } from "../../config/firebase";
+import { Autocomplete } from "@mui/material";
+import {
+  arrayUnion,
+  collection,
+  doc,
+  setDoc,
+  updateDoc,
+} from "firebase/firestore";
+import ProfilePopup from "../ProfilePage/ProfilePopup";
 
 const getPriorityColor = (priority) => {
   switch (priority.toLowerCase()) {
@@ -159,9 +180,9 @@ const TaskBox = ({
             variant="outlined"
             style={{ marginBottom: "10px" }}
           >
-            {members.map((member) => (
-              <MenuItem key={member.name} value={member.name}>
-                {member.name}
+            {members.map((member, index) => (
+              <MenuItem key={index} value={member.userName}>
+                {member.userName}
               </MenuItem>
             ))}
           </TextField>
@@ -317,13 +338,18 @@ const ProjectsPage = (props) => {
     // For demonstration purposes, setting it statically
     setSyncLeader("Leader Name");
   }, []);
+
+  const { id } = useParams();
+
+  const [createdTask, setCreatedTask] = useState(false);
+
   const [members, setMembers] = React.useState([
     { name: "Leader Name", role: "admin" },
   ]);
   const [syncLeader, setSyncLeader] = React.useState("Leader Name");
   const [newMemberName, setNewMemberName] = React.useState("");
   const [isAddMemberDialogOpen, setAddMemberDialogOpen] = React.useState(false);
-  const [isMemberEditMode, setMemberEditMode] = React.useState(false);
+  const [isMemberEditMode, setMemberEditMode] = React.useState(true);
   const [selectedMemberIndex, setSelectedMemberIndex] = React.useState(null);
   const [isMemberDeleteConfirmationOpen, setMemberDeleteConfirmationOpen] =
     React.useState(false);
@@ -345,9 +371,40 @@ const ProjectsPage = (props) => {
   const [isPriorityFieldFocused, setIsPriorityFieldFocused] =
     React.useState(false);
 
-  const handleDeleteMember = (index) => {
+  // const handleDeleteMember = (index) => {
+  //   setSelectedMemberIndex(index);
+  //   setMemberDeleteConfirmationOpen(true);
+  // };
+
+  const handleDeleteMember = async (index: any, memberId: any) => {
+    try {
+      const docData = await getUserSyncData(memberId);
+      const tempData = { ...docData };
+      console.log(tempData);
+      delete tempData.projectID[id];
+      const userDataRef = doc(db, "userData", memberId);
+      await updateDoc(userDataRef, tempData);
+    } catch (e) {
+      console.log(e);
+    }
+
+    const projectRef = doc(db, "projects", id);
+
+    try {
+      const docData = await getProjectsData(id);
+      const tempData = { ...docData };
+      console.log(tempData.projectMembers);
+      const updatedMembers = tempData.projectMembers.filter(
+        (member: any) => member.memberID !== memberId
+      );
+      await updateDoc(projectRef, { projectMembers: updatedMembers });
+    } catch (e) {
+      console.log(e);
+    }
+
     setSelectedMemberIndex(index);
     setMemberDeleteConfirmationOpen(true);
+    setMemberEditMode(false);
   };
 
   const handleCancelDelete = () => {
@@ -356,12 +413,41 @@ const ProjectsPage = (props) => {
     setMemberDeleteConfirmationOpen(false);
   };
 
-  const handleAddMember = () => {
-    if (newMemberName.trim() !== "") {
-      setMembers([...members, { name: newMemberName, role: "member" }]);
-      setNewMemberName("");
-      setAddMemberDialogOpen(false);
-    }
+  const handleAddMember = async () => {
+    memberArray.forEach(async (member: any) => {
+      getUserDetails(member.memberID).then((userDetail) => {
+        console.log(userDetail);
+        if (userDetail && !userDetail.error) {
+          setMembers([...members, { ...userDetail, role: "member" }]);
+        }
+      });
+      const memberProjectRef = doc(db, "userData", member.memberID);
+
+      try {
+        const userDataProjectDetails = {
+          projectName: projectName,
+        };
+        await updateDoc(memberProjectRef, {
+          [`projectID.${id}`]: userDataProjectDetails,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+
+      const projectRef = doc(db, "projects", id);
+      const toAddMemberArray = memberArray.map((member: any) => {
+        return { role: "member", memberID: member.memberID };
+      });
+      console.log(toAddMemberArray);
+      try {
+        await updateDoc(projectRef, {
+          projectMembers: arrayUnion(...toAddMemberArray),
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    });
+    setAddMemberDialogOpen(false);
   };
 
   const handleMemberEditToggle = () => {
@@ -376,11 +462,12 @@ const ProjectsPage = (props) => {
   const handleCloseMenu = () => {
     setAnchorEl(null);
   };
+  const [profilePopup, setProfilePopup] = React.useState(false);
 
-  const handleMenuAction = (action, index) => {
+  const handleMenuAction = (action, index, id: string) => {
     switch (action) {
       case "remove member":
-        handleDeleteMember(index);
+        handleDeleteMember(index, id);
         break;
       case "make admin":
         handleMakeAdmin(index);
@@ -389,7 +476,9 @@ const ProjectsPage = (props) => {
         handleRemoveAdmin(index);
         break;
       case "go to profile":
-        // Implement go to profile functionality
+        setProfileViewId(id);
+        setProfilePopup(true);
+        handleCloseMenu();
         break;
       default:
         console.error("Invalid action");
@@ -410,7 +499,7 @@ const ProjectsPage = (props) => {
       setMembers(updatedMembers);
     } else {
       console.log(
-        "Only the sync leader can remove admin role from other admins."
+        "Only the project leader can remove admin role from other admins."
       );
     }
   };
@@ -437,9 +526,35 @@ const ProjectsPage = (props) => {
     }));
   };
 
-  const handleTaskFormSubmit = () => {
+  const handleTaskFormSubmit = async () => {
+    const newTaskRef = doc(collection(db, "projects", id, "tasks"));
+    try {
+      await setDoc(newTaskRef, newTask);
+    } catch (e) {
+      console.log(e);
+    }
+
+    const memberData = await getDocData("userDetails");
+
+    let taskAssigneeID = "";
+
+    memberData?.map((member: any) => {
+      if (member.userName === newTask.assignee) {
+        taskAssigneeID = member.memberID;
+      }
+    });
+
+    console.log(taskAssigneeID);
+
+    try {
+      const userTaskRef = doc(db, "userData", taskAssigneeID);
+      await updateDoc(userTaskRef, { [`taskID.${newTaskRef.id}`]: newTask });
+    } catch (e) {
+      console.error(e);
+    }
+
     // Add the task without checking if all fields are filled
-    setTasks([...tasks, newTask]);
+    // setTasks([...tasks, newTask]);
     // Reset the newTask state to clear the form fields
     setNewTask({
       title: "",
@@ -450,6 +565,7 @@ const ProjectsPage = (props) => {
     });
     // Close the Add Task dialog
     setAddTaskDialogOpen(false);
+    setCreatedTask(true);
   };
 
   const handleTaskCompleted = (index) => {
@@ -477,6 +593,87 @@ const ProjectsPage = (props) => {
     );
     setTasks(updatedTasks);
   };
+
+  const [projectName, setProjectName] = useState("Project Name");
+  const [projectOwner, setProjectOwner] = useState("Owner Name");
+  const [projectData, setProjectData] = useState({});
+  const [projectMemberArray, setProjectMemberArray] = useState([]);
+  const [memberSearch, setMemberSearch] = useState([]);
+  const [addMembers, setAddMembers] = useState([]);
+  const [profileViewId, setProfileViewId] = React.useState("");
+  const closeProfilePopup = () => {
+    setProfilePopup(false);
+  };
+  useEffect(() => {
+    (async () => {
+      try {
+        const reqProjectData = await getProjectsData(id);
+        setProjectName(reqProjectData.projectName);
+        setProjectData(reqProjectData);
+        console.log(reqProjectData);
+        setProjectOwner(reqProjectData.projectOwner);
+        setSyncLeader(reqProjectData.projectOwner);
+        setProjectMemberArray(reqProjectData.projectMembers);
+        console.log(reqProjectData.projectMembers);
+        // console.log(syncData);
+
+        const reqTasksData = await getTasksData(id);
+
+        console.log(reqTasksData);
+
+        setTasks(reqTasksData);
+        setCreatedTask(false);
+
+        const memberData = await getDocData("userDetails");
+        // console.log(memberData);
+
+        let membersName: any = [];
+
+        let projectMembersUserDetails: any = [];
+
+        memberData?.forEach((member: any) => {
+          if (member.memberID !== auth.currentUser?.uid) {
+            membersName.push({
+              userName: member.userName,
+              userEmail: member.userEmail,
+              memberID: member.memberID,
+            });
+          }
+          projectMembersUserDetails.push(member);
+        });
+        // console.log(typeof membersName);
+        // console.log(projectMembersUserDetails);
+
+        console.log(reqProjectData.projectMembers);
+
+        setMembers(
+          projectMembersUserDetails
+            .filter((member: any) =>
+              reqProjectData.projectMembers
+                .map((member: any) => member.memberID, member.role)
+                .includes(member.memberID)
+            )
+            .map((element: any) => {
+              if (element.memberID === auth.currentUser?.uid)
+                return { ...element, role: "admin" };
+              else return { ...element, role: "member" };
+            })
+        );
+
+        setMemberSearch(
+          membersName.filter(
+            (n: any) =>
+              !reqProjectData.projectMembers
+                .map((member: any) => member.memberID)
+                .includes(n.memberID)
+          )
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    })();
+  }, [createdTask]);
+  const [memberArray, setMemberArray] = useState<any>([]);
 
   return (
     <Box
@@ -514,7 +711,7 @@ const ProjectsPage = (props) => {
             noWrap
             component="div"
           >
-            Project Name
+            {projectName}
           </Typography>
         </Toolbar>
       </Box>
@@ -539,7 +736,7 @@ const ProjectsPage = (props) => {
             >
               Members
             </Typography>
-            {members.length > 1 && (
+            {/* {members.length > 1 && (
               <EditIcon
                 sx={{
                   color: "#EE964B",
@@ -549,7 +746,7 @@ const ProjectsPage = (props) => {
                 }}
                 onClick={handleMemberEditToggle}
               />
-            )}
+            )} */}
             <AddBoxIcon
               sx={{
                 color: "#EE964B",
@@ -589,17 +786,19 @@ const ProjectsPage = (props) => {
                               }
                               onClose={handleCloseMenu}
                             >
-                              {member.role === "member" && (
-                                <MenuItem
-                                  onClick={() =>
-                                    handleMenuAction("make admin", index)
-                                  }
-                                >
-                                  Make Admin
-                                </MenuItem>
-                              )}
+                              {member.role === "member" &&
+                                auth.currentUser?.uid === projectOwner && (
+                                  <MenuItem
+                                    onClick={() =>
+                                      handleMenuAction("make admin", index)
+                                    }
+                                  >
+                                    Make Admin
+                                  </MenuItem>
+                                )}
                               {member.role === "admin" &&
-                                member.name !== syncLeader && (
+                                member.name !== syncLeader &&
+                                auth.currentUser?.uid === projectOwner && (
                                   <MenuItem
                                     onClick={() =>
                                       handleMenuAction("remove admin", index)
@@ -608,16 +807,26 @@ const ProjectsPage = (props) => {
                                     Remove Admin
                                   </MenuItem>
                                 )}
+                              {auth.currentUser?.uid === projectOwner && (
+                                <MenuItem
+                                  onClick={() =>
+                                    handleMenuAction(
+                                      "remove member",
+                                      index,
+                                      member.memberID
+                                    )
+                                  }
+                                >
+                                  Remove Member
+                                </MenuItem>
+                              )}
                               <MenuItem
                                 onClick={() =>
-                                  handleMenuAction("remove member", index)
-                                }
-                              >
-                                Remove Member
-                              </MenuItem>
-                              <MenuItem
-                                onClick={() =>
-                                  handleMenuAction("go to profile", index)
+                                  handleMenuAction(
+                                    "go to profile",
+                                    index,
+                                    member.memberID
+                                  )
                                 }
                               >
                                 Go to Profile
@@ -632,7 +841,9 @@ const ProjectsPage = (props) => {
                       </ListItemAvatar>
                       <ListItemText
                         primary={
-                          member.role === "admin" ? member.name : member.name
+                          member.role === "admin"
+                            ? member.userName
+                            : member.userName
                         }
                         secondary={secondary ? "Secondary text" : member.role}
                       />
@@ -691,9 +902,9 @@ const ProjectsPage = (props) => {
           open={isAddMemberDialogOpen}
           onClose={() => setAddMemberDialogOpen(false)}
         >
-          <DialogTitle>Sync Up!</DialogTitle>
+          <DialogTitle>Add Members</DialogTitle>
           <DialogContent>
-            <TextField
+            {/* <TextField
               autoFocus
               margin="dense"
               label="Member Name"
@@ -701,6 +912,27 @@ const ProjectsPage = (props) => {
               variant="outlined"
               value={newMemberName}
               onChange={(e) => setNewMemberName(e.target.value)}
+            /> */}
+            <Autocomplete
+              fullWidth={true}
+              multiple
+              id="members"
+              // name="syncDesc"
+              // type="syncDesc"
+              options={memberSearch}
+              getOptionLabel={(option) => option.userName}
+              // defaultValue={[top100Films[13]]}
+              filterSelectedOptions
+              onChange={(events, value) => setMemberArray(value)}
+              renderInput={(params) => (
+                <TextField
+                  margin="dense"
+                  {...params}
+                  label="Add Members"
+                  placeholder="Members"
+                  type="member"
+                />
+              )}
             />
           </DialogContent>
           <DialogActions>
@@ -758,11 +990,29 @@ const ProjectsPage = (props) => {
                   onChange={handleTaskFormChange}
                 >
                   {members.map((member, index) => (
-                    <MenuItem key={index} value={member.name}>
-                      {member.name}
+                    <MenuItem key={index} value={member.userName}>
+                      {member.userName}
                     </MenuItem>
                   ))}
                 </TextField>
+                {/* <Autocomplete
+                  fullWidth={true}
+                  multiple
+                  id="members"
+                  options={memberSearch}
+                  getOptionLabel={(option) => option.userName}
+                  filterSelectedOptions
+                  onChange={(events, value) => setMemberArray(value)}
+                  renderInput={(params) => (
+                    <TextField
+                      margin="dense"
+                      {...params}
+                      label="Add Members"
+                      placeholder="Members"
+                      type="member"
+                    />
+                  )}
+                /> */}
               </Grid>
               <Grid item xs={6}>
                 <TextField
@@ -865,7 +1115,13 @@ const ProjectsPage = (props) => {
             </Button>
           </DialogActions>
         </Dialog>
-
+        {profilePopup && (
+          <ProfilePopup
+            userID={profileViewId}
+            popUp={profilePopup}
+            closeProfilePopup={closeProfilePopup}
+          />
+        )}
         <Box
           sx={{
             display: "flex",

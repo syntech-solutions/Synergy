@@ -61,6 +61,54 @@ export const getSyncData = async (syncID: string) => {
   }
 };
 
+export const getProjectsData = async (projectID: string) => {
+  const docRef = doc(db, "projects", projectID);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    // console.log("Document data:", docSnap.data());
+    return docSnap.data();
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
+};
+
+export const getTasksData = async (projectID: string) => {
+  try {
+    const taskDetails: any = [];
+
+    // Query a reference to a subcollection
+    const querySnapshot = await getDocs(
+      collection(db, "projects", projectID, "tasks")
+    );
+
+    querySnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+
+      taskDetails.push({ ...doc.data(), taskID: doc.id });
+
+      // console.log(doc.id, " => ", doc.data());
+    });
+
+    return taskDetails;
+  } catch (e) {
+    console.error(e);
+  }
+};
+
+export const getTaskData = async (taskRef) => {
+  const docSnap = await getDoc(taskRef);
+
+  if (docSnap.exists()) {
+    // console.log("Document data:", docSnap.data());
+    return docSnap.data();
+  } else {
+    // docSnap.data() will be undefined in this case
+    console.log("No such document!");
+  }
+};
+
 // export const getSyncMembersUserDetails = async (memberArray: []) => {
 //   const docRef = doc(db, "syncs", syncID, "syncMembers");
 //   const docSnap = await getDoc(docRef);

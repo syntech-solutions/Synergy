@@ -16,6 +16,9 @@ import Profile from "../components/ProfilePage/Profile";
 import PeopleMain from "../components/PeopleMain/PeopleMain";
 import AdvancedCalendar from "../components/Calendar/AdvancedCalendar (1)";
 import SyncsPage from "../components/Syncs/syncspage";
+import ProjectsView from "../components/Projects/projectsView";
+import CallScreen from "../components/Call/CallScreen";
+import { auth } from "../config/firebase";
 
 const routes: RouteObject[] = [
   {
@@ -47,9 +50,7 @@ const routes: RouteObject[] = [
           },
           {
             path: "Projects",
-            element: (
-              <MiniDrawer mainContent={<ProjectsPage window={window} />} />
-            ),
+            element: <MiniDrawer mainContent={<ProjectsView />} />,
           },
           {
             path: "People",
@@ -71,12 +72,21 @@ const routes: RouteObject[] = [
         element: <MiniDrawer mainContent={<SyncsPage />} />,
       },
       {
+        path: "/Projects/:id",
+        element: <MiniDrawer mainContent={<ProjectsPage />} />,
+      },
+      {
         path: "/*",
         element: <h1>Page Not Found</h1>,
       },
       {
-        path: "/test",
-        element: <MainSyncs />,
+        path: "/Call",
+        element: (
+          <CallScreen
+            callID={"2vVr6HdMKifp5b8e8b0j"}
+            userID={auth.currentUser?.uid || "user1"}
+          />
+        ),
       },
     ],
   },

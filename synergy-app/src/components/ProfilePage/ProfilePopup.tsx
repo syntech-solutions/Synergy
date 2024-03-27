@@ -26,12 +26,17 @@ import { useEffect } from "react";
 import { auth } from "../../config/firebase";
 import { getUserDetails } from "../getFunctions";
 
-const ProfilePopup = (props: { userID: string; popUp: boolean }) => {
+const ProfilePopup = (props: {
+  userID: string;
+  popUp: boolean;
+  closeProfilePopup: Function;
+}) => {
   {
     /*useStates from existing Profile Page*/
   }
   const userID = props.userID;
   const userProfile = props.popUp;
+  const closeProfilePopup = props.closeProfilePopup;
   const [name, setName] = useState("Jane Doe");
   // const [username, setUsername] = useState("janedoe");
   const [email, setEmail] = useState("user@email.com");
@@ -52,7 +57,10 @@ const ProfilePopup = (props: { userID: string; popUp: boolean }) => {
   const handleOpenReport = () => setOpenReport(true);
   const handleCloseReport = () => setOpenReport(false);
   const handleOpenProfile = () => setOpenProfile(true);
-  const handleCloseProfile = () => setOpenProfile(false);
+  const handleCloseProfile = () => {
+    setOpenProfile(false);
+    closeProfilePopup();
+  };
 
   const [profileData, setProfileData] = useState({});
 

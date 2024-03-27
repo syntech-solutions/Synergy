@@ -40,7 +40,6 @@ import {
 import { useNavigate } from "react-router-dom";
 import { db, auth, storage } from "../../config/firebase";
 import { useEffect } from "react";
-import CreateSync from "./CreateSync";
 import { getDocData, getUserSyncData } from "../getFunctions";
 import {
   ref,
@@ -110,16 +109,15 @@ export default function ProjectsView() {
       console.log(e);
     }
 
-    newProjForm.syncMembers.forEach(async (member: any) => {
-      const memberSyncRef = doc(db, "userData", member.memberID);
+    newProjForm.projectMembers.forEach(async (member: any) => {
+      const memberProjectRef = doc(db, "userData", member.memberID);
 
       try {
-        const userDataSyncDetails = {
-          syncName: newProjForm.syncName,
-          syncImage: newProjForm.syncImage,
+        const userDataProjectDetails = {
+          projectName: newProjForm.projectName,
         };
-        await updateDoc(memberSyncRef, {
-          [`projectID.${newProjRef.id}`]: userDataSyncDetails,
+        await updateDoc(memberProjectRef, {
+          [`projectID.${newProjRef.id}`]: userDataProjectDetails,
         });
       } catch (e) {
         console.log(e);
@@ -131,7 +129,7 @@ export default function ProjectsView() {
 
   const [memberSearch, setMemberSearch] = useState([]);
 
-  const [syncData, setSyncData] = useState<any>([]);
+  const [projectData, setProjectData] = useState<any>([]);
 
   const [projectOwner, setProjectOwner] = useState<any>([]);
 
@@ -172,19 +170,17 @@ export default function ProjectsView() {
   useEffect(() => {
     (async () => {
       try {
-        const userSyncData = await getUserSyncData(auth.currentUser?.uid || "");
+        const userProjectData = await getUserSyncData(
+          auth.currentUser?.uid || ""
+        );
 
         let projectDataArray: any = [];
 
-        // userSyncData?.syncId.forEach((sync: any) => {
-        //   projectDataArray.push(sync);
-        // });
-
-        for (const [id, record] of Object.entries(userSyncData?.projectID)) {
+        for (const [id, record] of Object.entries(userProjectData?.projectID)) {
           projectDataArray.push([id, record]);
         }
 
-        setSyncData(projectDataArray);
+        setProjectData(projectDataArray);
         setCreatedProject(false);
       } catch (err) {
         console.log(err);
@@ -230,7 +226,7 @@ export default function ProjectsView() {
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search Syncs…"
+              placeholder="Search Projects…"
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
@@ -260,11 +256,11 @@ export default function ProjectsView() {
           }}
           onClick={handleClickOpen}
         >
-          New Sync
+          New Project
         </Button>
       </Box>
       <div style={{ width: "100%", flexGrow: 1, overflow: "auto" }}>
-        {syncData?.map((sync: any) => (
+        {projectData?.map((project: any) => (
           <Box
             sx={{
               display: "inline-flex",
@@ -278,17 +274,11 @@ export default function ProjectsView() {
               mb: { xs: 5, sm: 5, md: 5 },
             }}
             onClick={() => {
-              navigate("/Syncs/" + sync[0]);
+              navigate("/Projects/" + project[0]);
             }}
           >
-            <Card key={sync[0]} sx={{ width: "300px" }}>
+            <Card key={project[0]} sx={{ width: "300px" }}>
               <CardActionArea>
-                {/* <CardMedia
-                  component="img"
-                  height="140"
-                  image={sync[1].syncImage}
-                  alt="Sync Image"
-                /> */}
                 <CardContent
                   sx={{
                     backgroundColor: "#EE964B",
@@ -296,7 +286,7 @@ export default function ProjectsView() {
                   }}
                 >
                   <Typography variant="h5" component="div">
-                    {sync[1].syncName}
+                    {project[1].projectName}
                   </Typography>
                 </CardContent>
               </CardActionArea>
@@ -316,17 +306,16 @@ export default function ProjectsView() {
             const formJson = Object.fromEntries((formData as any).entries());
             memberArray.push(projectOwner);
 
-            formJson.syncMembers = memberArray.map((member: any) => {
+            formJson.projectMembers = memberArray.map((member: any) => {
               return { role: member.role, memberID: member.memberID };
             });
-            // formJson.syncImage = imgURL;
             formJson.projectOwner = auth.currentUser?.uid;
             createNewProject(formJson);
             handleClose();
           },
         }}
       >
-        <DialogTitle>Create New Sync</DialogTitle>
+        <DialogTitle>Create New Project</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
@@ -359,7 +348,7 @@ export default function ProjectsView() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Create New Sync</Button>
+          <Button type="submit">Create New Project</Button>
         </DialogActions>
       </Dialog>
     </ThemeProvider>

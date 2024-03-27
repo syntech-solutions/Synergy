@@ -182,7 +182,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
             "Syncs",
             "Chats",
             "Projects",
-            "People",
+            // "People",
             "Calendar",
           ].map((text, index) => (
             <ListItem
@@ -216,7 +216,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
                       case 3:
                         return <AssignmentIcon />;
                       case 4:
-                        return <AccountBoxIcon />;
+                      // return <AccountBoxIcon />;
                       case 5:
                         return <CalendarMonth />;
                     }

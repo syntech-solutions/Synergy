@@ -30,8 +30,8 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   getDocData,
   getSyncData,
@@ -43,6 +43,8 @@ import ProfilePopup from "../ProfilePage/ProfilePopup";
 import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import Header from "../FileStorage/Header";
 import FilesView from "../FileStorage/FilesView";
+import { createPortal } from "react-dom";
+import CallScreen from "../Call/CallScreen";
 
 document.body.style.backgroundColor = "#f9f9f1";
 
@@ -236,6 +238,9 @@ function SyncsPage(props: any) {
   };
 
   const [profilePopup, setProfilePopup] = React.useState(false);
+  const closeProfilePopup = () => {
+    setProfilePopup(false);
+  };
   const [profileViewId, setProfileViewId] = React.useState("");
 
   const handleMenuAction = (action: string, index: any, id: string) => {
@@ -402,15 +407,6 @@ function SyncsPage(props: any) {
                 .includes(n.memberID || auth.currentUser?.uid)
           )
         );
-        // console.log(
-        //   membersName.filter(
-        //     (n) =>
-        //       !reqSyncData.syncMembers
-        //         .map((member) => member.memberID)
-        //         .includes(n.memberID)
-        //   )
-        // );
-        // console.log(membersName.filter((n) => !members.includes(n)));
       } catch (err) {
         console.log(err);
       }
@@ -418,6 +414,8 @@ function SyncsPage(props: any) {
   }, []);
 
   const [memberArray, setMemberArray] = useState<any>([]);
+
+  const navigate = useNavigate();
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -478,6 +476,7 @@ function SyncsPage(props: any) {
             }}
             variant="contained"
             startIcon={<CallIcon />}
+            onClick={() => navigate(`/Call`)}
           >
             Start Meeting
           </Button>
@@ -958,7 +957,13 @@ function SyncsPage(props: any) {
             </Button>
           </DialogActions>
         </Dialog>
-        <ProfilePopup userID={profileViewId} popUp={profilePopup} />
+        {profilePopup && (
+          <ProfilePopup
+            userID={profileViewId}
+            popUp={profilePopup}
+            closeProfilePopup={closeProfilePopup}
+          />
+        )}
         <Box component="main">
           <Tabs variant="fullWidth" value={tabValue} onChange={handleTabChange}>
             <Tab
@@ -1027,5 +1032,24 @@ function SyncsPage(props: any) {
     </Box>
   );
 }
+
+// const NewWindow = ({ children, close }) => {
+//   const newWindow = useMemo(
+//     () =>
+//       window.open(
+//         "about:blank",
+//         "newWin",
+//         `width=400,height=300,left=${window.screen.availWidth / 2 - 200},top=${
+//           window.screen.availHeight / 2 - 150
+//         }`
+//       ),
+//     []
+//   );
+//   newWindow.onbeforeunload = () => {
+//     close();
+//   };
+//   // useEffect(() => () => newWindow.close());
+//   return createPortal(children, newWindow.document.body);
+// };
 
 export default SyncsPage;
