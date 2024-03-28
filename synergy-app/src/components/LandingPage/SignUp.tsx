@@ -183,7 +183,7 @@ const SignUp = () => {
     //const uid = auth.currentUser?.uid;
     //const docIdToExclude = uid; // replace with your document ID to exclude
     const querySnapshot = await getDocs(usersRef); // replace with your collection name
-    let userIDArr = [];
+    let userIDArr: any[] = [];
 
     querySnapshot.forEach((doc) => {
       //if (doc.id !== docIdToExclude) {

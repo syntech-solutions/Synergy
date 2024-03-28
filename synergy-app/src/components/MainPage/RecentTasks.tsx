@@ -10,7 +10,7 @@ import { auth, db } from "../../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { getUserSyncData } from "../getFunctions";
+import { getUserData } from "../getFunctions";
 
 export default function RecentTasks() {
   const [array, setArray] = useState<string[]>([]);
@@ -49,21 +49,21 @@ export default function RecentTasks() {
   const [isLoading, setLoading] = useState(true);
   const [singlePackage, setPackage] = useState([]);
 
-  React.useEffect(() => {
-    axios.get("http://localhost:5173/MainPage/Dashboard").then((response) => {
-      setPackage(response.data);
-      setLoading(false);
-    });
-  }, []);
+  // React.useEffect(() => {
+  //   axios.get("http://localhost:5173/MainPage/Dashboard").then((response) => {
+  //     setPackage(response.data);
+  //     setLoading(false);
+  //   });
+  // }, []);
 
   React.useEffect(() => {
     (async () => {
       try {
-        const userTaskData = await getUserSyncData(auth.currentUser?.uid || "");
+        const userTaskData = await getUserData(auth.currentUser?.uid || "");
 
         let taskDataArray: any = [];
 
-        for (const [id, record] of Object.entries(userTaskData?.taskId)) {
+        for (const [id, record] of Object.entries(userTaskData?.taskID)) {
           taskDataArray.push([id, record]);
         }
 
@@ -117,11 +117,11 @@ export default function RecentTasks() {
           {taskData.length === 0 ? (
             <Typography>No Tasks</Typography>
           ) : (
-            taskData.map((array: any[][]) => (
+            taskData.map((key, value) => (
               <Tasks
-                task={array[1][0]}
-                project={array[1][1]}
-                dueDate={array[1][2]}
+                task={value.title}
+                priority={value}
+                dueDate={value.deadline}
               />
             ))
           )}

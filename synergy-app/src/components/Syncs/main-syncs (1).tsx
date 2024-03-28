@@ -41,7 +41,7 @@ import { useNavigate } from "react-router-dom";
 import { db, auth, storage } from "../../config/firebase";
 import { useEffect } from "react";
 import CreateSync from "./CreateSync";
-import { getDocData, getUserSyncData } from "../getFunctions";
+import { getDocData, getUserData } from "../getFunctions";
 import {
   ref,
   uploadBytesResumable,
@@ -202,7 +202,7 @@ export default function MainSyncs() {
   useEffect(() => {
     (async () => {
       try {
-        const userSyncData = await getUserSyncData(auth.currentUser?.uid || "");
+        const userSyncData = await getUserData(auth.currentUser?.uid || "");
 
         let syncDataArray: any = [];
 

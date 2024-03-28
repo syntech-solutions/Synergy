@@ -3,7 +3,7 @@ import Checkbox from "@mui/material/Checkbox";
 
 const label = { inputProps: { "aria-label": "Checkbox" } };
 
-const DashboardTaskBox = ({ task, project, dueDate }) => {
+const DashboardTaskBox = ({ task, priority, dueDate }) => {
   return (
     <div
       style={{
@@ -25,7 +25,7 @@ const DashboardTaskBox = ({ task, project, dueDate }) => {
         <strong>Task:</strong> {task}
       </p>
       <p>
-        <strong>Project:</strong> {project}
+        <strong>Priority:</strong> {priority}
       </p>
       <p>
         <strong>Deadline:</strong> {dueDate}

@@ -16,7 +16,7 @@ import {
   CardContent,
   CircularProgress,
 } from "@mui/material";
-import { getUserSyncData } from "../getFunctions";
+import { getDocData, getUserData } from "../getFunctions";
 import axios from "axios";
 import Loader from "react-loader-spinner";
 
@@ -84,7 +84,7 @@ export default function RecentSyncs() {
   useEffect(() => {
     (async () => {
       try {
-        const userSyncData = await getUserSyncData(auth.currentUser?.uid || "");
+        const userSyncData = await getUserData(auth.currentUser?.uid || "");
         // console.log(typeof userSyncData?.syncID);
 
         let syncDataArray: any = [];
@@ -147,80 +147,47 @@ export default function RecentSyncs() {
         </Box>
         {/*  */}
         <div style={{ width: "100%", flexGrow: 1, overflow: "auto" }}>
-          {syncData?.map((sync: any) => (
-            // <Box
-            //   key={sync.key}
-            //   sx={{
-            //     width: "100%",
-            //     height: "180px",
-            //     maxWidth: "180px",
-            //     background: "#EE964B",
-            //     display: "inline-flex",
-            //     flexDirection: "column",
-            //     alignItems: "center",
-            //     justifyContent: "center",
-            //     margin: "25px",
-            //     borderRadius: "5px",
-            //     cursor: "pointer",
-            //   }}
-            //   onClick={() => {
-            //     navigate("/Syncs/" + sync[0]);
-            //   }}
-            // >
-            //   <SyncIcon
-            //     sx={{
-            //       color: "white",
-            //       fontSize: "70px",
-            //       paddingBottom: "10px",
-            //     }}
-            //   />
-            //   <Typography
-            //     sx={{
-            //       color: "white",
-            //       fontSize: "20px",
-            //     }}
-            //   >
-            //     {sync[1][0]}
-            //   </Typography>
-            // </Box>
-            <Box
-              sx={{
-                display: "inline-flex",
-                flexDirection: "row",
-                justifyContent: "center",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "50px",
-                mt: { xs: 2, sm: 2, md: 2 },
-                ml: { xs: 3, sm: 3, md: 3, lg: 3, xl: 3 },
-                mb: { xs: 2, sm: 2, md: 2 },
-              }}
-              onClick={() => {
-                navigate("/Syncs/" + sync[0]);
-              }}
-            >
-              <Card key={sync[0]} sx={{ width: "300px" }}>
-                <CardActionArea>
-                  <CardMedia
-                    component="img"
-                    height="140"
-                    image={sync[1].syncImage}
-                    alt="Sync Image"
-                  />
-                  <CardContent
-                    sx={{
-                      backgroundColor: "#EE964B",
-                      color: "white",
-                    }}
-                  >
-                    <Typography variant="h5" component="div">
-                      {sync[1].syncName}
-                    </Typography>
-                  </CardContent>
-                </CardActionArea>
-              </Card>
-            </Box>
-          ))}
+          {syncData &&
+            syncData?.map((sync: any) => (
+              <Box
+                sx={{
+                  display: "inline-flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                  gap: "50px",
+                  mt: { xs: 2, sm: 2, md: 2 },
+                  ml: { xs: 3, sm: 3, md: 3, lg: 3, xl: 3 },
+                  mb: { xs: 2, sm: 2, md: 2 },
+                }}
+                onClick={() => {
+                  navigate("/Syncs/" + sync[0]);
+                }}
+              >
+                <Card key={sync[0]} sx={{ width: "300px" }}>
+                  <CardActionArea>
+                    <CardMedia
+                      component="img"
+                      height="140"
+                      image={sync[1].syncImage}
+                      alt="Sync Image"
+                    />
+                    <CardContent
+                      sx={{
+                        backgroundColor: "#EE964B",
+                        color: "white",
+                      }}
+                    >
+                      <Typography variant="h5" component="div">
+                        {sync[1].syncName}
+                      </Typography>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Box>
+            ))}
+          {!syncData && <Typography>No Syncs</Typography>}
         </div>
       </>
     );

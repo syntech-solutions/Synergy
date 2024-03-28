@@ -38,7 +38,7 @@ import {
   getTaskData,
   getTasksData,
   getUserDetails,
-  getUserSyncData,
+  getUserData,
 } from "../getFunctions";
 import { auth, db } from "../../config/firebase";
 import { Autocomplete } from "@mui/material";
@@ -378,7 +378,7 @@ const ProjectsPage = (props) => {
 
   const handleDeleteMember = async (index: any, memberId: any) => {
     try {
-      const docData = await getUserSyncData(memberId);
+      const docData = await getUserData(memberId);
       const tempData = { ...docData };
       console.log(tempData);
       delete tempData.projectID[id];

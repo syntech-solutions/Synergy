@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import Alert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
-import { getDocData, getUserDetails, getUserSyncData } from "../getFunctions";
+import { getDocData, getUserDetails, getUserData } from "../getFunctions";
 import { auth, db } from "../../config/firebase";
 import { useEffect } from "react";
 import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
@@ -334,7 +334,7 @@ export default function ControlCalendar() {
   useEffect(() => {
     (async () => {
       try {
-        const reqUserData = await getUserSyncData(userID);
+        const reqUserData = await getUserData(userID);
         // setDbEvents({ ...dbEvents, ...reqUserData.events });
         console.log(dbEvents);
       } catch (err) {

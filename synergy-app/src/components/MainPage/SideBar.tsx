@@ -35,8 +35,11 @@ import { auth } from "../../config/firebase.js";
 import MainSync from "../Syncs/MainSync.js";
 import { useEffect } from "react";
 import { CalendarMonth } from "@mui/icons-material";
-
+import { getDocData } from "../getFunctions.js";
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 const drawerWidth = 240;
+
+const user = auth.currentUser?.uid;
 
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
@@ -128,6 +131,8 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
 
   let navigate = useNavigate();
 
+  const [menuArray, setMenuArray] = useState(["Profile", "Settings", "Logout"]);
+
   // mainContent = <Dashboard />;
   useEffect(() => {
     if (selectedPage) {
@@ -138,6 +143,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
       else if (selectedPage === "People") navigate("/MainPage/People");
       else if (selectedPage === "Profile") navigate("/MainPage/Profile");
       else if (selectedPage === "Calendar") navigate("/MainPage/Calendar");
+      else if (selectedPage === "Admin") navigate("/ModView");
       // if (selectedPage === "Dashboard") "Settings":
       else if (selectedPage === "Logout") {
         signOut(auth);
@@ -145,6 +151,24 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
       }
     }
   }, [selectedPage]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        console.log(user);
+        if (user) {
+          const userDoc = await getDocData("userRoles");
+          userDoc?.forEach((doc) => {
+            if (doc.memberID === user) {
+              setMenuArray(["Profile", "Settings", "Logout", "Admin"]);
+            }
+          });
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    })();
+  }, []);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -231,7 +255,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
         <Box sx={{ flexGrow: 1, p: 3 }} />
         <Divider />
         <List>
-          {["Profile", "Settings", "Logout"].map((text, index) => (
+          {menuArray.map((text, index) => (
             <ListItem
               key={text}
               disablePadding
@@ -247,6 +271,8 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
                       return <SettingsIcon />;
                     case 2:
                       return <LogoutIcon />;
+                    case 3:
+                      return <SupervisorAccountIcon />;
                   }
                 }}
                 sx={{
@@ -270,6 +296,8 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
                         return <SettingsIcon />;
                       case 2:
                         return <LogoutIcon />;
+                      case 3:
+                        return <SupervisorAccountIcon />;
                     }
                   })()}
                 </ListItemIcon>

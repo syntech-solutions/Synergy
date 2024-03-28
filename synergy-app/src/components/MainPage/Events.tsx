@@ -7,7 +7,7 @@ import Avatar from "@mui/material/Avatar";
 import EventIcon from "@mui/icons-material/Event";
 import Title from "./Title";
 import { useEffect } from "react";
-import { getUserSyncData } from "../getFunctions";
+import { getUserData } from "../getFunctions";
 import { auth } from "../../config/firebase";
 import moment from "moment";
 
@@ -22,7 +22,7 @@ export default function Events() {
   useEffect(() => {
     (async () => {
       try {
-        const reqUserData = await getUserSyncData(userID);
+        const reqUserData = await getUserData(userID);
         const reqDbEvents = reqUserData.eventID;
         const eventArray: any = [];
         Object.entries(reqDbEvents).forEach(([key, value]) => {

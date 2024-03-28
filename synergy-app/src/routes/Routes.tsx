@@ -19,6 +19,7 @@ import SyncsPage from "../components/Syncs/syncspage";
 import ProjectsView from "../components/Projects/projectsView";
 import CallScreen from "../components/Call/CallScreen";
 import { auth } from "../config/firebase";
+import ModDashboard from "../components/MainPage/ModDashboard";
 
 const routes: RouteObject[] = [
   {
@@ -74,6 +75,10 @@ const routes: RouteObject[] = [
       {
         path: "/Projects/:id",
         element: <MiniDrawer mainContent={<ProjectsPage />} />,
+      },
+      {
+        path: "/ModView",
+        element: <MiniDrawer mainContent={<ModDashboard />} />,
       },
       {
         path: "/*",

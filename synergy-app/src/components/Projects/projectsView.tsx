@@ -40,7 +40,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { db, auth, storage } from "../../config/firebase";
 import { useEffect } from "react";
-import { getDocData, getUserSyncData } from "../getFunctions";
+import { getDocData, getUserData } from "../getFunctions";
 import {
   ref,
   uploadBytesResumable,
@@ -170,9 +170,7 @@ export default function ProjectsView() {
   useEffect(() => {
     (async () => {
       try {
-        const userProjectData = await getUserSyncData(
-          auth.currentUser?.uid || ""
-        );
+        const userProjectData = await getUserData(auth.currentUser?.uid || "");
 
         let projectDataArray: any = [];
 

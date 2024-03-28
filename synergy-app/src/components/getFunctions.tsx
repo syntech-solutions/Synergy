@@ -35,7 +35,7 @@ export const getUserDetails = async (userID: string) => {
   }
 };
 
-export const getUserSyncData = async (userID: string) => {
+export const getUserData = async (userID: string) => {
   const docRef = doc(db, "userData", userID);
   const docSnap = await getDoc(docRef);
 
