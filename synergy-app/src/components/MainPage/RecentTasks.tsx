@@ -64,11 +64,11 @@ export default function RecentTasks() {
         let taskDataArray: any = [];
 
         for (const [id, record] of Object.entries(userTaskData?.taskID)) {
-          taskDataArray.push([id, record]);
+          taskDataArray.push(record);
         }
 
         setTaskData(taskDataArray);
-        // console.log(taskDataArray);
+        console.log(taskDataArray);
       } catch (err) {
         console.log(err);
       }
@@ -117,10 +117,10 @@ export default function RecentTasks() {
           {taskData.length === 0 ? (
             <Typography>No Tasks</Typography>
           ) : (
-            taskData.map((key, value) => (
+            taskData.map((value) => (
               <Tasks
                 task={value.title}
-                priority={value}
+                priority={value.priority}
                 dueDate={value.deadline}
               />
             ))
