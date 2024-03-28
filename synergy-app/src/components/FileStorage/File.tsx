@@ -53,7 +53,7 @@ const File = ({
         <Box
           sx={{
             position: "absolute",
-            ml: { sm: "0%", md: "23%" },
+            ml: { sm: "0%", md: "18%" },
             display: "flex",
           }}
         >
@@ -61,7 +61,7 @@ const File = ({
             Created:{" "}
           </Typography>
           <Typography sx={{ display: { xs: "none", sm: "none", md: "block" } }}>
-            {date?.toDate().toDateString()}
+            {date?.toDate().toLocaleDateString()}
           </Typography>
           <Typography
             sx={{ display: { xs: "block", sm: "block", md: "none" } }}
@@ -72,11 +72,12 @@ const File = ({
         <Typography
           sx={{
             position: "absolute",
-            ml: { xs: "37%", sm: "37%", md: "49%" },
+            ml: { xs: "37%", sm: "37%", md: "39%" },
             overflow: "hidden",
             width: "20%",
             wrap: "nowrap",
             maxHeight: "20px",
+            display: { xs: "none", sm: "none", md: "none", lg: "block" },
           }}
         >
           {type.includes("image")
@@ -88,7 +89,11 @@ const File = ({
             : "File"}
         </Typography>
         <Typography
-          sx={{ position: "absolute", ml: { xs: "60%", sm: "60%", md: "72%" } }}
+          sx={{
+            position: "absolute",
+            ml: { xs: "60%", sm: "60%", md: "57%" },
+            display: { xs: "none", sm: "none", md: "none", lg: "block" },
+          }}
         >
           {user}
         </Typography>
@@ -96,7 +101,7 @@ const File = ({
       <Box
         sx={{
           position: "absolute",
-          ml: { xs: "70%", sm: "70%", md: "85%" },
+          ml: { xs: "70%", sm: "70%", md: "50%", lg: "70%" },
           mt: "-55px",
         }}
       >

@@ -79,15 +79,12 @@ const routes: RouteObject[] = [
         path: "/*",
         element: <h1>Page Not Found</h1>,
       },
-      {
-        path: "/Call",
-        element: (
-          <CallScreen
-            callID={"2vVr6HdMKifp5b8e8b0j"}
-            userID={auth.currentUser?.uid || "user1"}
-          />
-        ),
-      },
+      // {
+      //   path: "/Call",
+      //   element: (
+      //     <CallScreen callID={"xRWq6SDcSeSHUrS5jqvR"} userID={"user1"} />
+      //   ),
+      // },
     ],
   },
 ];

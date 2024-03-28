@@ -69,8 +69,16 @@ function FilesView(prop: { syncID: string }) {
       >
         <Typography>Name</Typography>
         <Typography>Date Created</Typography>
-        <Typography>Type</Typography>
-        <Typography>Uploaded By</Typography>
+        <Typography
+          sx={{ display: { xs: "none", sm: "none", md: "none", lg: "block" } }}
+        >
+          Type
+        </Typography>
+        <Typography
+          sx={{ display: { xs: "none", sm: "none", md: "none", lg: "block" } }}
+        >
+          Uploaded By
+        </Typography>
         <Box> </Box>
       </Box>
       <Divider />

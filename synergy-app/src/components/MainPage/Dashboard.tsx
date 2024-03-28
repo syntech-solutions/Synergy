@@ -20,8 +20,8 @@ export default function Dashboard() {
         sx={{
           display: "flex",
           backgroundColor: "#f9f9f1",
-          height: "100vh",
-          width: { sm: "100%", md: "100%", lg: "100%" },
+          height: "100%",
+          width: "100%",
         }}
       >
         <CssBaseline />
@@ -30,14 +30,14 @@ export default function Dashboard() {
           sx={{
             backgroundColor: "#f9f9f1",
             flexGrow: 1,
-            height: "100vh",
-            width: "100vw",
+            height: "100%",
+            width: "100%",
             overflow: "auto",
           }}
         >
           <Box sx={{ margin: "30px", maxWidth: "100" }}>
             <Grid container spacing={3}>
-              <Grid item xs={15} md={8} lg={9}>
+              <Grid item xs={12} md={12} lg={9}>
                 <Paper
                   sx={{
                     p: 2,
@@ -47,6 +47,7 @@ export default function Dashboard() {
                     height: "auto",
                     minHeight: "330px",
                     maxHeight: "450px",
+                    width: "100%",
                   }}
                 >
                   <RecentSyncs />

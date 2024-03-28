@@ -285,10 +285,17 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
         sx={{
           flexGrow: 1,
           p: 0,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          // inset: 100,
+          width: `calc(100vw - ${drawerWidth}px)`,
+          // position: {
+          //   xs: "relative",
+          //   sm: "relative",
+          //   md: "fixed",
+          //   lg: "dixed",
+          //   xl: "fixed",
+          // },
+          // // inset: 50,
+          // ml: { md: `60px` },
         }}
-        // sx={{ flexGrow: 1, p: 3, position: "fixed", inset: 50 }}
       >
         <DrawerHeader />
         {mainContent}

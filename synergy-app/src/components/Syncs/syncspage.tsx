@@ -44,7 +44,7 @@ import { arrayUnion, doc, updateDoc } from "firebase/firestore";
 import Header from "../FileStorage/Header";
 import FilesView from "../FileStorage/FilesView";
 import { createPortal } from "react-dom";
-import CallScreen from "../Call/CallScreen";
+// import CallScreen from "../Call/CallScreen";
 
 document.body.style.backgroundColor = "#f9f9f1";
 
@@ -473,10 +473,15 @@ function SyncsPage(props: any) {
               ":hover": {
                 backgroundColor: "#EE964B",
               },
+              position: "absolute",
+              right: "90px",
             }}
             variant="contained"
             startIcon={<CallIcon />}
-            onClick={() => navigate(`/Call`)}
+            // onClick={() => navigate(`/Call`)}
+            onClick={() =>
+              window.open("http://localhost:5176/", "_blank", "noreferrer")
+            }
           >
             Start Meeting
           </Button>

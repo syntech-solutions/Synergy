@@ -92,7 +92,7 @@ const Header = (prop: { syncID: string }) => {
       <Box
         sx={{
           width: "100vh-10px",
-          backgroundColor: "orange",
+          backgroundColor: "secondary.main",
           p: "10px",
           sticky: "top",
         }}

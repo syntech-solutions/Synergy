@@ -897,13 +897,7 @@ const Chat = () => {
         <Box
           sx={{
             height: "12.3%",
-            width: {
-              xs: "100vw",
-              sm: "100vw",
-              md: "100vw",
-              lg: "66.55vw",
-              xl: "66.55vw",
-            },
+            width: "100%",
             p: "0.5%",
             paddingLeft: "2%",
             paddingRight: "0.5%",
