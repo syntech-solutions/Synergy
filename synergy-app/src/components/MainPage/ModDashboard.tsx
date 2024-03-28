@@ -233,8 +233,8 @@ export default function ModDashboard() {
   };
 
   return (
-    <Box sx={{ bgcolor: "#ded9d5", height: "100vh", width: "100vw" }}>
-      <AppBar
+    <Box sx={{ bgcolor: "#ded9d5", height: "100%", width: "100%" }}>
+      {/* <AppBar
         position="static"
         sx={{ backgroundColor: "#0c2c4b", width: "100vw" }}
       >
@@ -266,7 +266,7 @@ export default function ModDashboard() {
             </Menu>
           </div>
         </Toolbar>
-      </AppBar>
+      </AppBar> */}
       <Box
         sx={{
           display: "flex",
