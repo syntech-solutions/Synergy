@@ -39,8 +39,6 @@ import { getDocData } from "../getFunctions.js";
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 const drawerWidth = 240;
 
-const user = auth.currentUser?.uid;
-
 const openedMixin = (theme: Theme): CSSObject => ({
   width: drawerWidth,
   transition: theme.transitions.create("width", {
@@ -111,6 +109,9 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 export default function MiniDrawer({ mainContent = <Dashboard /> }) {
+  const [user, setUser] = useState(auth.currentUser);
+  // setUser(auth.currentUser?.uid);
+
   const theme = useTheme();
   const [open, setOpen] = React.useState(false);
 
@@ -132,6 +133,7 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
   let navigate = useNavigate();
 
   const [menuArray, setMenuArray] = useState(["Profile", "Settings", "Logout"]);
+  // console.log(menuArray);
 
   // mainContent = <Dashboard />;
   useEffect(() => {
@@ -155,11 +157,11 @@ export default function MiniDrawer({ mainContent = <Dashboard /> }) {
   useEffect(() => {
     (async () => {
       try {
-        console.log(user);
-        if (user) {
+        console.log(user?.uid);
+        if (user?.uid) {
           const userDoc = await getDocData("userRoles");
           userDoc?.forEach((doc) => {
-            if (doc.memberID === user) {
+            if (doc.memberID === user?.uid) {
               setMenuArray(["Profile", "Settings", "Logout", "Admin"]);
             }
           });
