@@ -108,7 +108,7 @@ const SignIn = () => {
       {/* Box with the top text */}
       <Box sx={{ mb: 5 }}>
         <Typography variant="h4" align="left" color="primary">
-          Welcome back to Synery!
+          Welcome back to Synergy!
         </Typography>
         <Typography variant="body1" align="left" color="secondary">
           Sign into your account

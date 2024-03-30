@@ -11,6 +11,11 @@ export default defineConfig({
         allow: ['..'],
       },
     },
+    optimizeDeps: {
+      include: ['@emotion/react', '@emotion/styled', '@mui/material/Tooltip'],
+    }
   },
 )
+
+
 

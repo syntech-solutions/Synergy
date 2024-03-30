@@ -78,7 +78,7 @@ function SyncsPage(props: any) {
   const [isAddMemberDialogOpen, setAddMemberDialogOpen] = React.useState(false);
   const [isMemberEditMode, setMemberEditMode] = React.useState(true);
   const [isSubSyncEditMode, setSubSyncEditMode] = React.useState(false);
-  const [tabValue, setTabValue] = React.useState(0);
+  const [tabValue, setTabValue] = React.useState(1);
   const [selectedMemberIndex, setSelectedMemberIndex] = React.useState(null);
   const [isMemberDeleteConfirmationOpen, setMemberDeleteConfirmationOpen] =
     React.useState(false);
@@ -480,7 +480,7 @@ function SyncsPage(props: any) {
             startIcon={<CallIcon />}
             // onClick={() => navigate(`/Call`)}
             onClick={() =>
-              window.open("http://localhost:5176/", "_blank", "noreferrer")
+              window.open("http://localhost:5174/", "_blank", "noreferrer")
             }
           >
             Start Meeting
