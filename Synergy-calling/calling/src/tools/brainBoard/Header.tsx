@@ -34,7 +34,7 @@ const Header = ({ boardName, ideasArray }: HeaderProps) => {
   const [pptLoading, setPPTLoading] = useState(false);
   const [socket, setSocket] = useState(io("http://localhost:4004"));
 
-  const apiKey = "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"; // Your OpenAI API key
+  const apiKey = ""; // Your OpenAI API key
   useEffect(() => {
     socket.on("connect", () => {
       socket.emit("join-room", "a", "brainboard");
